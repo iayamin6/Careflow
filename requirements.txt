@@ -1,0 +1,14 @@
+fastapi
+pydantic
+uvicorn
+pandas
+numpy
+faker
+scikit-learn
+xgboost
+shap
+python-dotenv
+jinja2
+groq
+streamlit
+plotly

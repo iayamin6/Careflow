@@ -1,0 +1,178 @@
+{
+  "name": "CareFlow Workflow 2: Inactivity Check",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "cronExpression",
+              "expression": "0 10 * * *"
+            }
+          ]
+        }
+      },
+      "id": "trigger",
+      "name": "Daily Schedule (10 AM)",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.1,
+      "position": [100, 300]
+    },
+    {
+      "parameters": {
+        "url": "http://host.docker.internal:8000/scores",
+        "options": {}
+      },
+      "id": "get_scores",
+      "name": "Get Customer Scores",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [300, 300]
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "data",
+        "options": {}
+      },
+      "id": "split_customers",
+      "name": "For Each Customer",
+      "type": "n8n-nodes-base.itemLists",
+      "typeVersion": 2.1,
+      "position": [500, 300]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "number": [
+            {
+              "value1": "={{ $json.days_since_login }}",
+              "operation": "largerEqual",
+              "value2": 7
+            }
+          ]
+        }
+      },
+      "id": "check_inactivity",
+      "name": "Inactive 7+ Days?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [700, 300]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://host.docker.internal:8000/email/generate",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "{\n  \"customer_id\": \"{{ $json.customer_id }}\",\n  \"email_type\": \"re_engagement\"\n}",
+        "options": {}
+      },
+      "id": "generate_email",
+      "name": "Generate Re-engagement Email",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [950, 200]
+    },
+    {
+      "parameters": {
+        "fromEmail": "REPLACE_WITH_YOUR_EMAIL",
+        "toEmail": "REPLACE_WITH_YOUR_EMAIL",
+        "subject": "={{ $json.subject }}",
+        "html": "={{ $json.body }}",
+        "options": {}
+      },
+      "id": "send_email",
+      "name": "Send Gmail SMTP",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [1150, 200]
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "sheetId": "REPLACE_WITH_GOOGLE_SHEET_ID",
+        "range": "CRM Log!A:E",
+        "options": {
+          "valueInputMode": "USER_ENTERED"
+        }
+      },
+      "id": "log_sheets",
+      "name": "Log to Google Sheets CRM",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.1,
+      "position": [1350, 200],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "REPLACE_IN_N8N_UI",
+          "name": "Google Sheets OAuth2"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Daily Schedule (10 AM)": {
+      "main": [
+        [
+          {
+            "node": "Get Customer Scores",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Customer Scores": {
+      "main": [
+        [
+          {
+            "node": "For Each Customer",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "For Each Customer": {
+      "main": [
+        [
+          {
+            "node": "Inactive 7+ Days?",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Inactive 7+ Days?": {
+      "main": [
+        [
+          {
+            "node": "Generate Re-engagement Email",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate Re-engagement Email": {
+      "main": [
+        [
+          {
+            "node": "Send Gmail SMTP",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send Gmail SMTP": {
+      "main": [
+        [
+          {
+            "node": "Log to Google Sheets CRM",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  }
+}

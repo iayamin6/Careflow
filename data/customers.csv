@@ -1,0 +1,201 @@
+customer_id,organization_name,organization_type,signup_date,last_login_date,login_frequency_weekly,features_used,features_used_count,onboarding_completion_percentage,support_tickets_raised,contract_value_usd,archetype
+CUST_0001,Mclaughlin-Sandoval,NGO,2025-04-14,2026-04-09,0,,0,6,6,10674,critical
+CUST_0002,Ortiz-Dorsey,NGO,2026-03-12,2026-05-17,4,audit_log|user_management,2,74,5,4611,at_risk
+CUST_0003,Suarez and Sons,government,2025-03-10,2026-05-23,4,export|analytics|api_integration|reporting|sso,5,46,2,29898,at_risk
+CUST_0004,"Adams, Trujillo and Marquez",government,2025-06-23,2026-05-26,20,sso|audit_log|reporting|user_management|dashboard|analytics|api_integration|notifications|custom_fields|export,10,97,0,8003,healthy
+CUST_0005,Jacobs-Daniel,government,2024-12-10,2026-05-04,0,analytics,1,29,10,15659,critical
+CUST_0006,"Waters, Howell and Williams",NGO,2025-05-20,2026-05-15,8,custom_fields|api_integration,2,74,3,3677,at_risk
+CUST_0007,Hamilton Ltd,government,2024-12-08,2026-05-16,7,user_management|dashboard,2,60,5,22546,at_risk
+CUST_0008,Rodriguez and Sons,enterprise,2025-02-04,2026-05-26,12,notifications|sso|api_integration|audit_log|reporting|export|custom_fields|user_management,8,93,1,86484,healthy
+CUST_0009,Hendricks Group,NGO,2024-12-04,2026-05-19,6,dashboard|reporting,2,49,3,13977,at_risk
+CUST_0010,"Anderson, Flores and Burton",enterprise,2026-03-27,2026-03-27,2,audit_log,1,16,5,99166,critical
+CUST_0011,Kelley-Martinez,enterprise,2025-01-30,2026-03-07,2,reporting,1,18,11,30730,critical
+CUST_0012,"Garcia, Lee and Gardner",enterprise,2025-02-04,2026-05-15,5,analytics|audit_log,2,52,3,59009,at_risk
+CUST_0013,"Horn, Powell and Douglas",enterprise,2024-12-26,2026-03-08,1,sso,1,1,6,57576,critical
+CUST_0014,Moss-Adams,government,2026-05-20,2026-05-28,7,reporting,1,56,3,58478,new
+CUST_0015,Allen-Maldonado,enterprise,2025-04-01,2026-05-27,11,audit_log|api_integration|analytics|sso|notifications|user_management|reporting|custom_fields,8,99,2,100422,healthy
+CUST_0016,Cox Group,government,2025-10-06,2026-05-26,16,reporting|user_management|audit_log|dashboard|api_integration|notifications|custom_fields|export,8,82,0,9652,healthy
+CUST_0017,Watson-Jones,NGO,2026-01-01,2026-05-06,0,,0,32,8,5562,critical
+CUST_0018,"Lawson, Sullivan and Tucker",NGO,2025-07-26,2026-04-28,3,sso|user_management,2,30,11,4119,critical
+CUST_0019,"Key, Hess and Valentine",enterprise,2025-09-20,2026-05-26,14,dashboard|reporting|custom_fields|user_management|export|api_integration|sso|notifications,8,81,0,80292,healthy
+CUST_0020,Vazquez Inc,government,2026-01-25,2026-05-15,4,sso|audit_log,2,46,2,47738,at_risk
+CUST_0021,Perez-Mann,NGO,2025-08-26,2026-05-27,17,sso|user_management|notifications|dashboard|reporting|audit_log|custom_fields|export|api_integration|analytics,10,97,1,12412,champion
+CUST_0022,Lee Ltd,enterprise,2024-07-19,2026-05-27,18,dashboard|audit_log|custom_fields|export|api_integration|sso|analytics|notifications,8,98,0,17455,champion
+CUST_0023,"Alvarez, Flores and Gallagher",NGO,2025-05-23,2026-05-28,24,notifications|reporting|user_management|analytics|custom_fields|dashboard|export|audit_log,8,100,1,5272,champion
+CUST_0024,"Weiss, Fernandez and Jackson",enterprise,2025-11-19,2026-05-27,12,analytics|sso|export|notifications|dashboard|audit_log,6,89,2,83792,healthy
+CUST_0025,Sanders Ltd,NGO,2025-04-25,2026-05-24,18,reporting|user_management|export|api_integration|custom_fields|audit_log|notifications|analytics|dashboard,9,100,1,11868,champion
+CUST_0026,"Matthews, Carey and Flores",NGO,2025-12-14,2026-05-28,10,api_integration|analytics|audit_log|sso|reporting|custom_fields|export|notifications|user_management,9,91,1,5114,healthy
+CUST_0027,"Huerta, Lee and Clarke",NGO,2025-08-27,2026-05-25,18,export|api_integration|analytics|reporting|custom_fields|user_management|sso,7,99,0,2832,champion
+CUST_0028,Sharp-Anderson,enterprise,2025-01-21,2026-05-27,15,custom_fields|audit_log|api_integration|user_management|reporting|dashboard|sso,7,86,0,56898,healthy
+CUST_0029,"Roberts, Walters and Campbell",NGO,2025-05-22,2026-05-28,14,custom_fields|api_integration|user_management|notifications|reporting|export|sso|dashboard,8,80,2,6442,healthy
+CUST_0030,Bauer-Romero,government,2025-03-14,2026-04-13,0,reporting|notifications,2,2,12,19577,critical
+CUST_0031,Nelson and Sons,government,2025-10-31,2026-05-26,20,dashboard|user_management|notifications|api_integration|sso|custom_fields,6,99,1,28012,healthy
+CUST_0032,Norton-Jackson,government,2025-05-16,2026-03-07,0,,0,16,7,43049,critical
+CUST_0033,Carr-Rodriguez,government,2025-10-21,2026-05-28,25,export|notifications|reporting|user_management|analytics|sso|api_integration|dashboard|custom_fields,9,95,0,28869,champion
+CUST_0034,"Harris, Barnes and Perry",enterprise,2025-01-12,2026-05-13,6,analytics|audit_log,2,59,5,52753,at_risk
+CUST_0035,Haynes-Palmer,government,2025-07-19,2026-05-19,3,api_integration|analytics|notifications|audit_log|dashboard,5,59,4,18774,at_risk
+CUST_0036,Krueger PLC,enterprise,2025-06-22,2026-05-13,5,user_management|audit_log|sso|notifications|export,5,50,2,47196,at_risk
+CUST_0037,Rodriguez-Flores,enterprise,2025-06-15,2026-05-13,1,user_management|custom_fields|api_integration|dashboard,4,42,3,72277,at_risk
+CUST_0038,Hoffman Group,NGO,2025-09-07,2026-03-22,3,,0,24,12,7547,critical
+CUST_0039,Smith-Adkins,enterprise,2025-05-11,2026-05-28,20,user_management|api_integration|sso|dashboard|analytics|reporting|notifications|export,8,79,1,97500,healthy
+CUST_0040,"Lee, Reese and Turner",enterprise,2025-06-28,2026-05-13,6,audit_log|sso|api_integration|export|user_management,5,68,4,108536,at_risk
+CUST_0041,Zimmerman-Erickson,enterprise,2025-12-08,2026-05-24,16,analytics|sso|reporting|export|api_integration|audit_log,6,83,1,51904,healthy
+CUST_0042,Schmitt PLC,NGO,2026-05-23,2026-05-27,6,user_management|reporting,2,36,3,6421,new
+CUST_0043,Myers PLC,government,2026-03-28,2026-05-17,5,custom_fields|notifications,2,70,2,28052,at_risk
+CUST_0044,"Perry, Burns and Stanley",government,2025-02-16,2026-05-25,17,audit_log|user_management|sso|reporting|api_integration|custom_fields|analytics|dashboard|notifications|export,10,96,2,57307,healthy
+CUST_0045,"Terry, Torres and Rios",NGO,2025-02-22,2026-05-09,4,notifications|dashboard,2,45,5,3223,at_risk
+CUST_0046,Erickson-Barrett,NGO,2026-05-26,2026-05-26,9,sso|export,2,31,3,5558,new
+CUST_0047,"Beasley, Jordan and Nelson",government,2025-12-20,2026-05-04,0,audit_log|dashboard,2,22,8,47607,critical
+CUST_0048,Khan Inc,enterprise,2026-04-08,2026-05-28,10,custom_fields|api_integration|user_management|reporting|sso,5,96,0,83920,healthy
+CUST_0049,Franco PLC,government,2025-03-12,2026-05-26,18,api_integration|analytics|reporting|audit_log|dashboard|custom_fields|user_management,7,98,0,9980,champion
+CUST_0050,Archer Inc,enterprise,2025-12-25,2026-05-20,7,custom_fields|dashboard,2,62,5,96706,at_risk
+CUST_0051,"Zimmerman, Castillo and Anderson",enterprise,2025-06-01,2026-05-13,2,reporting|notifications|export|sso|user_management,5,49,5,33086,at_risk
+CUST_0052,Flynn Inc,enterprise,2025-12-11,2026-03-07,1,custom_fields,1,17,10,42177,critical
+CUST_0053,Romero Group,NGO,2026-05-19,2026-05-25,6,export|dashboard|sso|notifications,4,30,1,8988,new
+CUST_0054,Young and Sons,government,2025-11-05,2026-05-26,18,audit_log|dashboard|user_management|custom_fields|reporting|sso|analytics,7,92,0,50259,healthy
+CUST_0055,"Knight, Adams and Patel",enterprise,2025-08-20,2026-05-09,1,user_management|notifications|custom_fields|api_integration,4,63,5,82544,at_risk
+CUST_0056,"Knight, Martin and Aguilar",government,2024-12-04,2026-05-13,5,analytics|custom_fields|audit_log|reporting|dashboard,5,52,4,12835,at_risk
+CUST_0057,Kerr LLC,enterprise,2026-01-24,2026-04-20,1,analytics,1,37,9,23176,critical
+CUST_0058,Dunlap-Hart,government,2026-05-20,2026-05-26,5,audit_log,1,18,2,7982,new
+CUST_0059,Lopez-Mccoy,enterprise,2025-02-03,2026-05-27,26,dashboard|analytics|sso|user_management|notifications|api_integration|reporting,7,95,1,72616,champion
+CUST_0060,Sanders-Molina,NGO,2025-10-05,2026-05-25,10,dashboard|api_integration|audit_log|notifications|analytics|sso|custom_fields|user_management|export|reporting,10,94,2,13955,healthy
+CUST_0061,Mcguire Ltd,enterprise,2025-10-16,2026-03-18,1,notifications|analytics,2,36,5,89905,critical
+CUST_0062,"Vasquez, Watson and Crawford",NGO,2025-05-01,2026-05-27,20,api_integration|user_management|custom_fields|analytics|dashboard|reporting|export,7,98,1,12294,champion
+CUST_0063,Garcia Group,government,2026-04-12,2026-05-16,5,sso|reporting|user_management|api_integration,4,52,5,12521,at_risk
+CUST_0064,Pennington Ltd,enterprise,2026-02-11,2026-05-15,2,api_integration|analytics,2,58,5,26299,at_risk
+CUST_0065,Thomas-Richardson,government,2025-05-05,2026-05-11,5,sso|reporting|dashboard|user_management|export,5,60,4,6695,at_risk
+CUST_0066,Summers Inc,enterprise,2025-02-24,2026-05-24,16,analytics|dashboard|api_integration|user_management|custom_fields|notifications|sso|audit_log|reporting|export,10,77,1,55607,healthy
+CUST_0067,"Castro, Alexander and Mosley",government,2025-05-20,2026-05-20,3,sso|analytics|notifications|custom_fields|audit_log,5,42,5,10771,at_risk
+CUST_0068,Bridges Group,government,2026-02-28,2026-05-25,15,audit_log|sso|notifications|dashboard|reporting|analytics|api_integration|user_management|export|custom_fields,10,99,0,18340,healthy
+CUST_0069,"Woods, Foster and Mccall",NGO,2025-01-09,2026-05-26,16,reporting|dashboard|user_management|export|custom_fields|api_integration|audit_log|analytics,8,88,0,4681,healthy
+CUST_0070,Maxwell-Warren,NGO,2024-08-14,2026-05-28,25,analytics|audit_log|custom_fields|user_management|notifications|export|reporting|sso|dashboard|api_integration,10,96,0,2143,champion
+CUST_0071,Duncan LLC,government,2025-11-05,2026-05-24,11,analytics|sso|api_integration|user_management|custom_fields|notifications|audit_log,7,85,2,54995,healthy
+CUST_0072,"Waller, Tate and Barron",government,2025-01-06,2026-05-13,4,custom_fields|notifications|user_management,3,66,2,25852,at_risk
+CUST_0073,"Brooks, Johnson and Johnson",enterprise,2025-01-16,2026-03-27,2,api_integration|sso,2,2,7,75836,critical
+CUST_0074,Evans-Wang,government,2025-08-19,2026-05-25,17,dashboard|api_integration|notifications|sso|export|reporting|custom_fields|analytics|audit_log|user_management,10,99,1,47587,champion
+CUST_0075,"Vance, Doyle and Christensen",government,2025-02-16,2026-05-24,14,sso|audit_log|dashboard|analytics|custom_fields|reporting|api_integration|export|user_management|notifications,10,78,2,51130,healthy
+CUST_0076,Miller Ltd,government,2026-05-22,2026-05-23,6,export,1,60,0,24226,new
+CUST_0077,"Gibbs, Escobar and Cunningham",government,2026-02-13,2026-05-16,6,api_integration|custom_fields|reporting,3,64,3,37615,at_risk
+CUST_0078,"Odom, Morales and Woodward",NGO,2025-04-06,2026-05-25,26,analytics|dashboard|sso|api_integration|export|custom_fields|reporting|audit_log|user_management|notifications,10,99,1,11468,champion
+CUST_0079,Morton-Mills,enterprise,2025-03-18,2026-05-25,18,sso|reporting|user_management|custom_fields|analytics|api_integration|export|notifications|audit_log|dashboard,10,100,1,45976,champion
+CUST_0080,Mckinney-Barnes,enterprise,2025-03-26,2026-05-28,18,analytics|user_management|export|reporting|sso|notifications|api_integration|audit_log,8,99,2,110593,healthy
+CUST_0081,Williams-Taylor,NGO,2025-06-11,2026-05-02,3,,0,19,12,1546,critical
+CUST_0082,Keith-Michael,enterprise,2026-02-20,2026-05-21,4,api_integration|user_management|custom_fields|notifications|analytics,5,63,4,118851,at_risk
+CUST_0083,"Travis, Osborne and Strickland",government,2024-12-19,2026-05-26,19,sso|reporting|api_integration|notifications|audit_log,5,96,2,49197,healthy
+CUST_0084,"Mora, Mcgee and Booker",enterprise,2024-11-20,2026-05-28,21,audit_log|reporting|sso|api_integration|export|notifications|user_management|analytics|custom_fields,9,95,0,71797,champion
+CUST_0085,Sanchez LLC,enterprise,2025-11-12,2026-05-24,12,sso|analytics|notifications|dashboard|reporting,5,76,0,49893,healthy
+CUST_0086,Sanders and Sons,NGO,2025-08-22,2026-05-27,23,sso|export|notifications|analytics|audit_log|reporting|user_management|api_integration|dashboard|custom_fields,10,99,1,5583,champion
+CUST_0087,Bishop-Berry,government,2026-01-07,2026-05-25,14,reporting|export|audit_log|dashboard|user_management|api_integration|custom_fields,7,78,1,11007,healthy
+CUST_0088,Vazquez-Welch,enterprise,2025-06-05,2026-02-27,0,user_management,1,8,8,18992,critical
+CUST_0089,Malone-Castillo,enterprise,2026-05-21,2026-05-24,5,api_integration|dashboard|analytics,3,19,1,80807,new
+CUST_0090,Huang-King,NGO,2026-03-03,2026-05-28,9,user_management|export|dashboard|reporting|api_integration|sso|notifications,7,98,1,9619,healthy
+CUST_0091,Johnson-Peterson,NGO,2025-08-28,2026-05-25,21,custom_fields|reporting|sso|analytics|audit_log|notifications|dashboard|api_integration|export,9,89,2,1510,healthy
+CUST_0092,Davis LLC,government,2025-02-19,2026-05-25,15,sso|custom_fields|reporting|dashboard|api_integration,5,94,0,9304,healthy
+CUST_0093,"Tate, Allen and Green",enterprise,2025-06-08,2026-05-24,17,notifications|audit_log|analytics|user_management|sso|export|custom_fields,7,78,2,24996,healthy
+CUST_0094,"Green, Morgan and Costa",enterprise,2026-04-29,2026-05-24,6,user_management|notifications|export|audit_log,4,39,3,64524,new
+CUST_0095,"Harvey, Sanders and Gonzalez",government,2025-09-22,2026-04-04,2,api_integration,1,30,6,10978,critical
+CUST_0096,Brown-Owens,NGO,2026-05-14,2026-05-28,7,custom_fields,1,45,2,11977,new
+CUST_0097,Smith Ltd,government,2025-02-05,2026-05-25,18,custom_fields|analytics|export|dashboard|audit_log|sso|reporting,7,79,2,36600,healthy
+CUST_0098,Fisher Ltd,NGO,2025-10-31,2026-05-24,12,custom_fields|user_management|notifications|sso|analytics|export|dashboard,7,94,2,14589,healthy
+CUST_0099,Roman-Simmons,NGO,2026-01-26,2026-04-10,2,export,1,0,7,3347,critical
+CUST_0100,Harmon-Bullock,government,2026-03-24,2026-05-19,8,reporting|audit_log,2,53,5,32514,at_risk
+CUST_0101,Mitchell LLC,NGO,2025-10-21,2026-05-14,7,dashboard|api_integration,2,50,2,12042,at_risk
+CUST_0102,Santos-Foster,government,2025-05-25,2026-05-25,16,notifications|analytics|user_management|custom_fields|audit_log|dashboard|api_integration|reporting,8,78,1,49447,healthy
+CUST_0103,"Perez, Price and Griffin",government,2025-08-02,2026-04-05,0,custom_fields,1,3,5,18397,critical
+CUST_0104,Vaughn PLC,NGO,2025-04-01,2026-05-27,21,export|reporting|dashboard|user_management|custom_fields|notifications|audit_log,7,79,1,9725,healthy
+CUST_0105,Scott-Shelton,enterprise,2025-07-16,2026-03-30,0,dashboard|notifications,2,1,12,20205,critical
+CUST_0106,Whitaker-Jones,enterprise,2026-05-14,2026-05-24,10,analytics|reporting|notifications|dashboard,4,30,1,115030,new
+CUST_0107,Olson-Jacobson,government,2024-11-24,2026-05-28,21,notifications|custom_fields|reporting|user_management|api_integration|export|sso|audit_log,8,96,0,38455,champion
+CUST_0108,Martin and Sons,enterprise,2025-08-10,2026-04-20,1,api_integration|user_management,2,6,7,43550,critical
+CUST_0109,Wilson Ltd,enterprise,2026-02-09,2026-05-28,11,sso|custom_fields|export|notifications|audit_log|api_integration|reporting|user_management,8,77,1,67961,healthy
+CUST_0110,Willis Inc,government,2025-06-30,2026-05-07,2,,0,19,12,34616,critical
+CUST_0111,"Arnold, Carter and Scott",government,2025-02-27,2026-05-26,10,custom_fields|audit_log|notifications|user_management|analytics,5,92,2,7688,healthy
+CUST_0112,Ochoa-Levy,enterprise,2025-05-30,2026-05-17,5,audit_log|api_integration|dashboard|user_management|sso,5,61,2,76132,at_risk
+CUST_0113,Alvarado Inc,NGO,2025-12-23,2026-03-19,2,custom_fields|api_integration,2,23,10,5634,critical
+CUST_0114,Hernandez-Rodriguez,government,2025-05-16,2026-05-22,8,reporting|export|custom_fields|analytics,4,64,4,21514,at_risk
+CUST_0115,"Green, Sanchez and Taylor",enterprise,2024-12-21,2026-04-25,0,api_integration|export,2,19,11,26901,critical
+CUST_0116,Douglas-Morris,NGO,2025-11-21,2026-05-11,7,audit_log|reporting|notifications,3,72,4,1298,at_risk
+CUST_0117,Duncan Ltd,NGO,2024-12-28,2026-05-17,4,user_management|api_integration|audit_log,3,44,4,14835,at_risk
+CUST_0118,Sharp-Hamilton,enterprise,2025-03-30,2026-03-06,3,,0,21,7,88282,critical
+CUST_0119,"Anderson, Ward and Frazier",NGO,2026-01-26,2026-05-18,7,notifications|export,2,55,5,11003,at_risk
+CUST_0120,Jenkins-Espinoza,enterprise,2025-03-23,2026-05-25,12,analytics|sso|user_management|api_integration|export|custom_fields,6,89,1,110851,healthy
+CUST_0121,Guerrero LLC,government,2025-08-14,2026-05-24,13,custom_fields|api_integration|analytics|dashboard|export|user_management,6,86,2,11723,healthy
+CUST_0122,Torres-Kirby,enterprise,2025-02-17,2026-04-29,0,,0,17,12,77286,critical
+CUST_0123,"Ramirez, Webb and Butler",government,2026-03-13,2026-05-27,15,notifications|dashboard|custom_fields|analytics|api_integration,5,82,1,10348,healthy
+CUST_0124,Fischer-Moody,NGO,2025-11-16,2026-05-20,8,api_integration|custom_fields|dashboard|audit_log,4,70,3,13432,at_risk
+CUST_0125,Becker-Richards,government,2025-06-17,2026-05-14,0,user_management,1,9,11,12286,critical
+CUST_0126,Young-Salazar,NGO,2025-11-25,2026-04-29,0,custom_fields,1,29,6,2816,critical
+CUST_0127,Olsen Inc,government,2026-05-08,2026-05-24,4,api_integration|analytics,2,37,0,45292,new
+CUST_0128,Archer-Landry,enterprise,2025-09-27,2026-05-18,8,audit_log|export,2,44,2,61177,at_risk
+CUST_0129,Flores Ltd,NGO,2026-05-07,2026-05-25,8,export,1,60,0,6649,new
+CUST_0130,Lopez and Sons,enterprise,2025-06-11,2026-05-28,22,export|api_integration|dashboard|audit_log|analytics|notifications|reporting|custom_fields|user_management|sso,10,95,0,116364,healthy
+CUST_0131,"Murillo, Hines and Crawford",enterprise,2025-03-27,2026-05-25,8,dashboard|user_management|custom_fields|api_integration|notifications|analytics,6,87,2,72049,healthy
+CUST_0132,"Rivas, Ramirez and Smith",enterprise,2026-01-21,2026-05-26,12,export|analytics|reporting|notifications|api_integration|user_management|audit_log|custom_fields|sso|dashboard,10,85,0,75038,healthy
+CUST_0133,Strickland PLC,government,2025-01-10,2026-03-09,0,notifications|reporting,2,27,7,40748,critical
+CUST_0134,Clayton-Travis,NGO,2026-03-19,2026-05-26,18,sso|notifications|api_integration|export|user_management|custom_fields|audit_log,7,76,2,6776,healthy
+CUST_0135,"Gonzales, Johnson and Mcintyre",government,2025-12-09,2026-05-07,1,notifications|export,2,32,7,7040,critical
+CUST_0136,Pierce-Grant,enterprise,2025-05-16,2026-05-25,7,user_management|export|audit_log|custom_fields|analytics,5,76,2,30111,healthy
+CUST_0137,Burton PLC,government,2025-10-20,2026-03-19,1,,0,33,10,31085,critical
+CUST_0138,Washington Inc,government,2025-12-22,2026-05-28,9,sso|audit_log|notifications|analytics|dashboard|api_integration,6,99,1,51139,healthy
+CUST_0139,Davis and Sons,enterprise,2025-12-03,2026-05-08,2,reporting|sso|api_integration,3,68,2,116235,at_risk
+CUST_0140,Collins-Ray,government,2025-05-22,2026-03-31,1,audit_log|analytics,2,19,7,51649,critical
+CUST_0141,Walsh-Ross,enterprise,2025-06-06,2026-04-22,2,,0,7,8,113817,critical
+CUST_0142,Estrada-Webster,government,2026-04-15,2026-05-26,17,sso|audit_log|api_integration|analytics|dashboard|export|custom_fields,7,87,2,52111,healthy
+CUST_0143,Sanders-Hunt,government,2025-03-31,2026-05-10,5,export|reporting|sso,3,69,4,13410,at_risk
+CUST_0144,Evans-Frost,enterprise,2026-05-07,2026-05-24,4,audit_log|dashboard|reporting|analytics,4,19,2,31581,new
+CUST_0145,"Moore, Greene and Reynolds",enterprise,2026-01-03,2026-05-26,16,analytics|user_management|custom_fields|reporting|export,5,84,2,79924,healthy
+CUST_0146,Rivera-Wilson,enterprise,2026-02-01,2026-05-24,16,custom_fields|export|dashboard|notifications|sso|audit_log,6,76,2,111059,healthy
+CUST_0147,"Perez, Russell and Simmons",enterprise,2026-01-11,2026-05-10,7,sso|audit_log,2,58,4,73300,at_risk
+CUST_0148,"Williams, George and Taylor",enterprise,2025-10-03,2026-05-26,14,dashboard|api_integration|sso|user_management|notifications|export|reporting|analytics|custom_fields|audit_log,10,97,1,106233,healthy
+CUST_0149,"Coleman, English and Phillips",government,2024-10-17,2026-05-27,22,export|user_management|sso|dashboard|api_integration|audit_log|reporting,7,96,0,8316,champion
+CUST_0150,"Shaw, Sampson and Thompson",government,2025-02-10,2026-05-24,13,export|custom_fields|user_management|notifications|reporting|sso,6,91,1,37686,healthy
+CUST_0151,Calderon-Rojas,government,2026-05-27,2026-05-28,10,user_management|custom_fields|export|dashboard,4,13,2,37433,new
+CUST_0152,"King, Strong and Cruz",enterprise,2025-05-19,2026-05-08,5,reporting|notifications,2,48,4,105355,at_risk
+CUST_0153,Brock PLC,government,2025-10-23,2026-05-22,4,export|audit_log|analytics,3,44,5,38046,at_risk
+CUST_0154,Obrien-Schultz,enterprise,2025-12-06,2026-05-20,2,export|custom_fields|audit_log|notifications|reporting,5,52,5,75546,at_risk
+CUST_0155,Jenkins-Phillips,NGO,2026-02-17,2026-05-26,21,sso|api_integration|audit_log|custom_fields|analytics|notifications|reporting|user_management|export,9,93,1,9311,healthy
+CUST_0156,Brown-Eaton,enterprise,2026-05-12,2026-05-23,7,export,1,31,0,64596,new
+CUST_0157,Ross and Sons,enterprise,2025-02-06,2026-05-23,6,custom_fields|user_management|dashboard|analytics,4,70,3,78712,at_risk
+CUST_0158,Gibson-Holmes,enterprise,2025-03-28,2026-03-27,1,,0,2,6,35006,critical
+CUST_0159,Stafford and Sons,government,2025-09-26,2026-05-27,15,notifications|audit_log|sso|custom_fields|export|dashboard,6,97,0,38992,healthy
+CUST_0160,"Parker, Morales and Brown",government,2025-05-24,2026-05-25,16,api_integration|sso|export|analytics|custom_fields|audit_log|user_management,7,81,0,23284,healthy
+CUST_0161,Beck-Mccall,NGO,2025-01-01,2026-05-14,5,sso|export|custom_fields,3,62,4,5715,at_risk
+CUST_0162,Escobar Inc,enterprise,2025-07-24,2026-05-25,14,analytics|dashboard|custom_fields|export|audit_log|api_integration,6,89,2,43612,healthy
+CUST_0163,"Kelley, King and Taylor",NGO,2026-01-15,2026-03-07,2,analytics|api_integration,2,6,8,4972,critical
+CUST_0164,Duke-Howard,enterprise,2026-01-03,2026-05-27,7,export|sso|reporting|custom_fields|audit_log|dashboard|notifications|user_management,8,95,1,72580,healthy
+CUST_0165,Leach PLC,government,2025-11-15,2026-04-08,1,,0,36,8,40071,critical
+CUST_0166,Wilkinson and Sons,NGO,2025-01-16,2026-04-22,0,,0,25,12,4052,critical
+CUST_0167,"Willis, Allen and Johnson",government,2025-10-22,2026-05-28,20,export|analytics|sso|custom_fields|audit_log|notifications|user_management,7,96,1,22880,champion
+CUST_0168,"Diaz, Spencer and May",NGO,2025-11-10,2026-05-27,19,analytics|api_integration|dashboard|export|audit_log|notifications|reporting|sso|user_management|custom_fields,10,91,1,2421,healthy
+CUST_0169,Clay-Miller,NGO,2026-01-24,2026-05-19,5,dashboard|analytics|notifications,3,55,5,13349,at_risk
+CUST_0170,"Serrano, Wallace and Wilcox",government,2025-11-25,2026-05-24,20,analytics|export|user_management|dashboard|audit_log,5,78,1,25106,healthy
+CUST_0171,Boyd and Sons,enterprise,2025-08-14,2026-05-26,18,analytics|export|user_management|reporting|notifications|sso|audit_log|custom_fields|api_integration|dashboard,10,97,2,71712,healthy
+CUST_0172,Smith-Williams,enterprise,2025-03-02,2026-04-17,1,reporting|audit_log,2,28,10,20237,critical
+CUST_0173,Garrett-Clements,NGO,2025-09-27,2026-05-24,23,api_integration|export|sso|dashboard|audit_log|reporting|user_management|notifications,8,99,1,14249,champion
+CUST_0174,Johnson LLC,NGO,2025-08-09,2026-05-25,16,audit_log|sso|analytics|export|dashboard,5,87,1,14376,healthy
+CUST_0175,"Meyer, Morris and Miller",NGO,2025-07-06,2026-05-28,8,reporting|audit_log|dashboard|sso|user_management|notifications|api_integration,7,88,0,13598,healthy
+CUST_0176,Jones-Roberson,enterprise,2024-12-14,2026-05-25,13,notifications|custom_fields|reporting|export|audit_log|analytics|sso|api_integration,8,86,0,33392,healthy
+CUST_0177,"Stewart, Ramirez and Merritt",government,2025-07-22,2026-05-27,14,sso|audit_log|notifications|analytics|user_management|reporting|custom_fields|export|api_integration,9,96,1,17352,champion
+CUST_0178,Dickerson Ltd,enterprise,2025-08-06,2026-05-28,26,user_management|custom_fields|reporting|dashboard|analytics|notifications|audit_log,7,99,0,42077,champion
+CUST_0179,Garcia Ltd,government,2025-09-16,2026-04-15,1,,0,8,9,20346,critical
+CUST_0180,"Davis, Espinoza and Griffith",enterprise,2026-05-09,2026-05-26,7,api_integration|audit_log|user_management,3,36,2,46064,new
+CUST_0181,Pope and Sons,enterprise,2025-02-02,2026-05-27,19,audit_log|sso|dashboard|api_integration|export|user_management|notifications|analytics,8,88,1,29558,healthy
+CUST_0182,Franco-Huff,NGO,2025-04-07,2026-05-24,14,analytics|api_integration|sso|dashboard|custom_fields|user_management,6,88,2,9683,healthy
+CUST_0183,Buck-Hill,NGO,2025-12-19,2026-05-27,14,sso|export|reporting|analytics|audit_log,5,81,0,5398,healthy
+CUST_0184,Knight-Clark,enterprise,2025-06-24,2026-05-22,1,sso|user_management|export,3,59,2,37762,at_risk
+CUST_0185,Mcguire-Hoffman,enterprise,2025-08-01,2026-05-25,19,notifications|user_management|export|custom_fields|api_integration|audit_log|analytics|sso,8,100,1,50425,champion
+CUST_0186,Williams LLC,enterprise,2025-02-01,2026-05-25,14,sso|export|user_management|api_integration|notifications|custom_fields|dashboard|audit_log|analytics|reporting,10,75,1,82523,healthy
+CUST_0187,Rosales-Lee,enterprise,2024-09-28,2026-05-26,16,user_management|notifications|custom_fields|sso|analytics|api_integration|export|reporting|audit_log,9,98,0,106045,champion
+CUST_0188,"Mcpherson, Martin and Rios",NGO,2026-02-16,2026-03-06,0,dashboard|audit_log,2,2,6,14402,critical
+CUST_0189,"Torres, Martinez and Galloway",NGO,2025-09-29,2026-04-27,1,,0,9,5,4583,critical
+CUST_0190,"Wright, Berger and Dixon",government,2026-03-29,2026-05-08,7,dashboard|audit_log,2,66,2,6096,at_risk
+CUST_0191,Evans LLC,government,2025-07-28,2026-05-14,3,api_integration|reporting|audit_log|analytics|sso,5,55,3,45617,at_risk
+CUST_0192,Thomas Inc,government,2025-12-13,2026-05-11,2,sso|user_management|audit_log|api_integration|export,5,45,2,11127,at_risk
+CUST_0193,Edwards-Alvarado,government,2025-07-20,2026-05-08,3,api_integration|reporting,2,71,5,47264,at_risk
+CUST_0194,"Wade, Wright and Jackson",enterprise,2024-12-14,2026-05-02,1,,0,13,12,45532,critical
+CUST_0195,Williams PLC,NGO,2025-05-13,2026-05-26,17,dashboard|api_integration|export|custom_fields|reporting|analytics|sso|audit_log|user_management|notifications,10,84,0,10239,healthy
+CUST_0196,Singh Inc,government,2025-05-17,2026-05-24,13,api_integration|reporting|export|dashboard|notifications|user_management|audit_log|sso|analytics|custom_fields,10,99,1,6941,healthy
+CUST_0197,"Odonnell, Barnes and Clark",government,2025-08-20,2026-04-15,2,notifications,1,11,11,10616,critical
+CUST_0198,Walls-Cortez,government,2025-03-16,2026-04-13,1,,0,17,7,29903,critical
+CUST_0199,Cordova LLC,enterprise,2026-02-09,2026-03-26,1,,0,5,5,50405,critical
+CUST_0200,Vazquez PLC,government,2026-03-07,2026-05-19,1,sso|audit_log|notifications|dashboard|custom_fields,5,45,4,41321,at_risk

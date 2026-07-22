@@ -1,0 +1,120 @@
+{
+  "name": "CareFlow Workflow 3: New Customer Onboarding",
+  "nodes": [
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            }
+          ]
+        },
+        "documentId": {
+          "__rl": true,
+          "value": "REPLACE_WITH_GOOGLE_SHEET_ID",
+          "mode": "id"
+        },
+        "sheetName": "New Customers",
+        "options": {}
+      },
+      "id": "sheets_trigger",
+      "name": "On Row Added (Google Sheets)",
+      "type": "n8n-nodes-base.googleSheetsTrigger",
+      "typeVersion": 1,
+      "position": [100, 300],
+      "credentials": {
+        "googleSheetsTriggerOAuth2Api": {
+          "id": "REPLACE_IN_N8N_UI",
+          "name": "Google Sheets Trigger OAuth2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://host.docker.internal:8000/email/generate",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "{\n  \"customer_id\": \"{{ $json.customer_id }}\",\n  \"email_type\": \"onboarding_welcome\"\n}",
+        "options": {}
+      },
+      "id": "generate_email",
+      "name": "Generate Onboarding Email",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [350, 300]
+    },
+    {
+      "parameters": {
+        "fromEmail": "REPLACE_WITH_YOUR_EMAIL",
+        "toEmail": "REPLACE_WITH_YOUR_EMAIL",
+        "subject": "={{ $json.subject }}",
+        "html": "={{ $json.body }}",
+        "options": {}
+      },
+      "id": "send_email",
+      "name": "Send Gmail SMTP",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [550, 300]
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "sheetId": "REPLACE_WITH_GOOGLE_SHEET_ID",
+        "range": "CRM Log!A:E",
+        "options": {
+          "valueInputMode": "USER_ENTERED"
+        }
+      },
+      "id": "log_sheets",
+      "name": "Log to Google Sheets CRM",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.1,
+      "position": [750, 300],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "REPLACE_IN_N8N_UI",
+          "name": "Google Sheets OAuth2"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "On Row Added (Google Sheets)": {
+      "main": [
+        [
+          {
+            "node": "Generate Onboarding Email",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate Onboarding Email": {
+      "main": [
+        [
+          {
+            "node": "Send Gmail SMTP",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send Gmail SMTP": {
+      "main": [
+        [
+          {
+            "node": "Log to Google Sheets CRM",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  }
+}

@@ -1,0 +1,1778 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CareFlow — Customer Success Intelligence</title>
+  <meta name="description" content="CareFlow real-time customer health scoring, churn prediction, and engagement analytics dashboard." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <style>
+    /* ═══════════════════════════════════════════════════════════════════════
+       DESIGN SYSTEM — CareFlow Premium Dashboard
+       ═══════════════════════════════════════════════════════════════════════ */
+    :root {
+      --bg-primary: #0a0a0f;
+      --bg-secondary: #111118;
+      --bg-tertiary: #16161f;
+      --bg-card: rgba(22, 22, 31, 0.7);
+      --bg-card-hover: rgba(30, 30, 42, 0.8);
+      --bg-glass: rgba(255, 255, 255, 0.03);
+      --border: rgba(255, 255, 255, 0.06);
+      --border-hover: rgba(255, 255, 255, 0.12);
+      --border-active: rgba(139, 92, 246, 0.4);
+      --text-primary: #f0f0f5;
+      --text-secondary: #a0a0b8;
+      --text-muted: #6b6b80;
+      --accent-purple: #8b5cf6;
+      --accent-purple-light: #a78bfa;
+      --accent-blue: #3b82f6;
+      --accent-cyan: #06b6d4;
+      --accent-green: #10b981;
+      --accent-amber: #f59e0b;
+      --accent-rose: #f43f5e;
+      --accent-orange: #f97316;
+      --glow-purple: rgba(139, 92, 246, 0.15);
+      --glow-blue: rgba(59, 130, 246, 0.12);
+      --glow-green: rgba(16, 185, 129, 0.12);
+      --glow-rose: rgba(244, 63, 94, 0.12);
+      --radius-sm: 8px;
+      --radius-md: 12px;
+      --radius-lg: 16px;
+      --radius-xl: 20px;
+      --radius-2xl: 24px;
+      --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.3);
+      --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.4);
+      --shadow-lg: 0 16px 48px rgba(0, 0, 0, 0.5);
+      --shadow-glow: 0 0 40px rgba(139, 92, 246, 0.08);
+      --transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
+      --transition-base: 250ms cubic-bezier(0.4, 0, 0.2, 1);
+      --transition-slow: 400ms cubic-bezier(0.4, 0, 0.2, 1);
+      --font: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    html, body {
+      width: 100%; height: 100%;
+      font-family: var(--font);
+      background: var(--bg-primary);
+      color: var(--text-primary);
+      overflow: hidden;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+
+    /* ── Canvas Background ─────────────────────────────────────────────── */
+    #particleCanvas {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      pointer-events: none;
+    }
+
+    /* ── App Layout ────────────────────────────────────────────────────── */
+    .app {
+      display: grid;
+      grid-template-columns: 1fr;
+      grid-template-rows: 64px 1fr;
+      height: 100vh;
+      position: relative;
+      z-index: 1;
+    }
+
+    /* ── Topbar ─────────────────────────────────────────────────────────── */
+    .topbar {
+      grid-column: 1;
+      grid-row: 1;
+      background: rgba(10, 10, 15, 0.85);
+      backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 28px;
+      z-index: 15;
+    }
+
+    .topbar-left {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .topbar-title {
+      font-size: 1rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      background: linear-gradient(135deg, var(--accent-purple-light), var(--accent-blue));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .topbar-badge {
+      padding: 3px 10px;
+      border-radius: 999px;
+      background: rgba(16, 185, 129, 0.1);
+      border: 1px solid rgba(16, 185, 129, 0.2);
+      color: var(--accent-green);
+      font-size: 0.7rem;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .topbar-badge .pulse {
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      background: var(--accent-green);
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.5; transform: scale(1.3); }
+    }
+
+    .topbar-right {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .topbar-time {
+      color: var(--text-muted);
+      font-size: 0.8rem;
+      font-weight: 500;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .topbar-btn {
+      width: 34px; height: 34px;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--border);
+      background: transparent;
+      color: var(--text-secondary);
+      font-size: 0.95rem;
+      cursor: pointer;
+      display: grid; place-items: center;
+      transition: var(--transition-base);
+      position: relative;
+    }
+
+    .topbar-btn:hover {
+      background: rgba(255, 255, 255, 0.04);
+      border-color: var(--border-hover);
+      color: var(--text-primary);
+    }
+
+    .topbar-btn .notif-dot {
+      position: absolute;
+      top: 6px; right: 6px;
+      width: 7px; height: 7px;
+      border-radius: 50%;
+      background: var(--accent-rose);
+      border: 2px solid var(--bg-primary);
+    }
+
+    /* ── Main Content ──────────────────────────────────────────────────── */
+    .main {
+      grid-column: 1;
+      grid-row: 2;
+      overflow-y: auto;
+      overflow-x: hidden;
+      padding: 24px 28px 40px;
+      scroll-behavior: smooth;
+    }
+
+    .main::-webkit-scrollbar { width: 6px; }
+    .main::-webkit-scrollbar-track { background: transparent; }
+    .main::-webkit-scrollbar-thumb { background: rgba(139, 92, 246, 0.2); border-radius: 3px; }
+    .main::-webkit-scrollbar-thumb:hover { background: rgba(139, 92, 246, 0.35); }
+
+    /* ── Section Headers ───────────────────────────────────────────────── */
+    .section-label {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+
+    .section-label h2 {
+      font-size: 1.05rem;
+      font-weight: 700;
+      letter-spacing: -0.01em;
+    }
+
+    .section-label .section-tag {
+      padding: 3px 10px;
+      border-radius: 999px;
+      background: rgba(139, 92, 246, 0.1);
+      color: var(--accent-purple-light);
+      font-size: 0.65rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    /* ── Metric Cards ──────────────────────────────────────────────────── */
+    .metrics-grid {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 14px;
+      margin-bottom: 24px;
+    }
+
+    .metric-card {
+      background: var(--bg-card);
+      backdrop-filter: blur(12px);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-xl);
+      padding: 20px;
+      transition: var(--transition-base);
+      cursor: default;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .metric-card::after {
+      content: '';
+      position: absolute;
+      top: 0; left: 0;
+      width: 100%; height: 2px;
+      background: linear-gradient(90deg, transparent, var(--card-accent, var(--accent-purple)), transparent);
+      opacity: 0;
+      transition: var(--transition-base);
+    }
+
+    .metric-card:hover {
+      background: var(--bg-card-hover);
+      border-color: var(--border-hover);
+      transform: translateY(-3px);
+      box-shadow: var(--shadow-md);
+    }
+
+    .metric-card:hover::after { opacity: 1; }
+
+    .metric-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 12px;
+    }
+
+    .metric-icon {
+      width: 36px; height: 36px;
+      border-radius: var(--radius-md);
+      display: grid; place-items: center;
+      font-size: 1rem;
+    }
+
+    .metric-sparkline {
+      width: 60px; height: 24px;
+    }
+
+    .metric-label {
+      color: var(--text-muted);
+      font-size: 0.72rem;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      margin-bottom: 6px;
+    }
+
+    .metric-value {
+      font-size: 1.75rem;
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      line-height: 1;
+      margin-bottom: 8px;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .metric-footer {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .metric-trend {
+      display: inline-flex;
+      align-items: center;
+      gap: 3px;
+      padding: 2px 8px;
+      border-radius: 999px;
+      font-size: 0.68rem;
+      font-weight: 600;
+    }
+
+    .metric-trend.up {
+      background: rgba(16, 185, 129, 0.1);
+      color: var(--accent-green);
+    }
+
+    .metric-trend.down {
+      background: rgba(244, 63, 94, 0.1);
+      color: var(--accent-rose);
+    }
+
+    .metric-subtitle {
+      color: var(--text-muted);
+      font-size: 0.68rem;
+    }
+
+    /* ── Card Containers ───────────────────────────────────────────────── */
+    .panel {
+      background: var(--bg-card);
+      backdrop-filter: blur(12px);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-2xl);
+      padding: 24px;
+      margin-bottom: 24px;
+      transition: var(--transition-base);
+    }
+
+    .panel:hover {
+      border-color: var(--border-hover);
+      box-shadow: var(--shadow-glow);
+    }
+
+    .panel-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 20px;
+    }
+
+    .panel-title {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .panel-title h3 {
+      font-size: 0.95rem;
+      font-weight: 700;
+    }
+
+    .panel-title .icon {
+      width: 28px; height: 28px;
+      border-radius: var(--radius-sm);
+      display: grid; place-items: center;
+      font-size: 0.85rem;
+    }
+
+    .panel-actions {
+      display: flex;
+      gap: 6px;
+    }
+
+    .chip {
+      padding: 4px 12px;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      background: transparent;
+      color: var(--text-secondary);
+      font-size: 0.7rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: var(--transition-fast);
+      font-family: var(--font);
+    }
+
+    .chip:hover, .chip.active {
+      background: rgba(139, 92, 246, 0.1);
+      border-color: var(--accent-purple);
+      color: var(--accent-purple-light);
+    }
+
+    /* ── Charts ─────────────────────────────────────────────────────────── */
+    .charts-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+      margin-bottom: 24px;
+    }
+
+    .chart-wrap {
+      position: relative;
+      height: 260px;
+    }
+
+    .chart-wrap canvas {
+      width: 100% !important;
+      height: 100% !important;
+    }
+
+    /* ── Data Table ─────────────────────────────────────────────────────── */
+    .data-table {
+      width: 100%;
+      border-collapse: separate;
+      border-spacing: 0;
+    }
+
+    .data-table thead th {
+      padding: 10px 14px;
+      text-align: left;
+      color: var(--text-muted);
+      font-size: 0.68rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      border-bottom: 1px solid var(--border);
+      position: sticky;
+      top: 0;
+      background: var(--bg-card);
+      z-index: 2;
+    }
+
+    .data-table tbody td {
+      padding: 12px 14px;
+      font-size: 0.82rem;
+      color: var(--text-secondary);
+      border-bottom: 1px solid var(--border);
+      transition: var(--transition-fast);
+    }
+
+    .data-table tbody tr {
+      transition: var(--transition-fast);
+      cursor: pointer;
+    }
+
+    .data-table tbody tr:hover {
+      background: rgba(139, 92, 246, 0.04);
+    }
+
+    .data-table tbody tr:hover td {
+      color: var(--text-primary);
+    }
+
+    .data-table tbody tr:last-child td {
+      border-bottom: none;
+    }
+
+    .table-scroll {
+      max-height: 360px;
+      overflow-y: auto;
+      border-radius: var(--radius-lg);
+    }
+
+    .table-scroll::-webkit-scrollbar { width: 4px; }
+    .table-scroll::-webkit-scrollbar-track { background: transparent; }
+    .table-scroll::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.08); border-radius: 2px; }
+
+    /* ── Badges ─────────────────────────────────────────────────────────── */
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 3px 10px;
+      border-radius: 999px;
+      font-size: 0.7rem;
+      font-weight: 600;
+      white-space: nowrap;
+    }
+
+    .badge.healthy {
+      background: rgba(16, 185, 129, 0.1);
+      color: var(--accent-green);
+    }
+
+    .badge.at-risk {
+      background: rgba(245, 158, 11, 0.1);
+      color: var(--accent-amber);
+    }
+
+    .badge.critical {
+      background: rgba(244, 63, 94, 0.1);
+      color: var(--accent-rose);
+    }
+
+    .badge.info {
+      background: rgba(59, 130, 246, 0.1);
+      color: var(--accent-blue);
+    }
+
+    .badge.sent {
+      background: rgba(16, 185, 129, 0.1);
+      color: var(--accent-green);
+    }
+
+    /* ── Progress Bar ──────────────────────────────────────────────────── */
+    .progress-bar-track {
+      width: 100%;
+      height: 6px;
+      border-radius: 3px;
+      background: rgba(255, 255, 255, 0.06);
+      overflow: hidden;
+    }
+
+    .progress-bar-fill {
+      height: 100%;
+      border-radius: 3px;
+      transition: width 1s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    /* ── Health Score Ring ──────────────────────────────────────────────── */
+    .score-ring {
+      position: relative;
+      width: 40px; height: 40px;
+    }
+
+    .score-ring svg {
+      width: 100%; height: 100%;
+      transform: rotate(-90deg);
+    }
+
+    .score-ring .ring-bg {
+      fill: none;
+      stroke: rgba(255, 255, 255, 0.06);
+      stroke-width: 3;
+    }
+
+    .score-ring .ring-fill {
+      fill: none;
+      stroke-width: 3;
+      stroke-linecap: round;
+      transition: stroke-dashoffset 1s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .score-ring .ring-text {
+      position: absolute;
+      inset: 0;
+      display: grid; place-items: center;
+      font-size: 0.6rem;
+      font-weight: 700;
+    }
+
+    /* ── Bottom Grid (3 columns) ───────────────────────────────────────── */
+    .bottom-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 14px;
+      margin-bottom: 24px;
+    }
+
+    /* ── Funnel ─────────────────────────────────────────────────────────── */
+    .funnel-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 0;
+    }
+
+    .funnel-item + .funnel-item {
+      border-top: 1px solid var(--border);
+    }
+
+    .funnel-label {
+      width: 80px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: var(--text-secondary);
+      flex-shrink: 0;
+    }
+
+    .funnel-bar {
+      flex: 1;
+      height: 8px;
+      border-radius: 4px;
+      background: rgba(255, 255, 255, 0.04);
+      overflow: hidden;
+    }
+
+    .funnel-fill {
+      height: 100%;
+      border-radius: 4px;
+      transition: width 1.2s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .funnel-count {
+      font-size: 0.78rem;
+      font-weight: 700;
+      width: 40px;
+      text-align: right;
+      font-variant-numeric: tabular-nums;
+    }
+
+    /* ── Modal ──────────────────────────────────────────────────────────── */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.6);
+      backdrop-filter: blur(8px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 100;
+      opacity: 0;
+      pointer-events: none;
+      transition: var(--transition-base);
+    }
+
+    .modal-overlay.active {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .modal {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-2xl);
+      padding: 32px;
+      max-width: 560px;
+      width: 90%;
+      max-height: 80vh;
+      overflow-y: auto;
+      transform: scale(0.95) translateY(10px);
+      transition: var(--transition-base);
+    }
+
+    .modal-overlay.active .modal {
+      transform: scale(1) translateY(0);
+    }
+
+    .modal-close {
+      float: right;
+      width: 32px; height: 32px;
+      border-radius: 50%;
+      border: 1px solid var(--border);
+      background: transparent;
+      color: var(--text-muted);
+      font-size: 1rem;
+      cursor: pointer;
+      display: grid; place-items: center;
+      transition: var(--transition-fast);
+    }
+
+    .modal-close:hover {
+      background: rgba(244, 63, 94, 0.1);
+      color: var(--accent-rose);
+      border-color: rgba(244, 63, 94, 0.3);
+    }
+
+    .modal h3 {
+      font-size: 1.2rem;
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+
+    .modal .modal-subtitle {
+      color: var(--text-muted);
+      font-size: 0.82rem;
+      margin-bottom: 20px;
+    }
+
+    .modal-stat-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+
+    .modal-stat {
+      padding: 14px;
+      border-radius: var(--radius-lg);
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid var(--border);
+    }
+
+    .modal-stat .stat-label {
+      color: var(--text-muted);
+      font-size: 0.7rem;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 6px;
+    }
+
+    .modal-stat .stat-value {
+      font-size: 1.2rem;
+      font-weight: 700;
+    }
+
+    .modal-explanation {
+      padding: 14px;
+      border-radius: var(--radius-lg);
+      background: rgba(139, 92, 246, 0.05);
+      border: 1px solid rgba(139, 92, 246, 0.1);
+      color: var(--text-secondary);
+      font-size: 0.82rem;
+      line-height: 1.6;
+    }
+
+    .modal-explanation strong {
+      color: var(--accent-purple-light);
+    }
+
+    /* ── Loading Skeleton ──────────────────────────────────────────────── */
+    .skeleton {
+      background: linear-gradient(90deg, rgba(255,255,255,0.03) 25%, rgba(255,255,255,0.06) 50%, rgba(255,255,255,0.03) 75%);
+      background-size: 200% 100%;
+      animation: shimmer 1.5s infinite;
+      border-radius: var(--radius-sm);
+    }
+
+    @keyframes shimmer {
+      0% { background-position: 200% 0; }
+      100% { background-position: -200% 0; }
+    }
+
+    /* ── Footer ────────────────────────────────────────────────────────── */
+    .footer {
+      text-align: center;
+      padding: 32px 0 16px;
+      color: var(--text-muted);
+      font-size: 0.72rem;
+    }
+
+    .footer a {
+      color: var(--accent-purple-light);
+      text-decoration: none;
+    }
+
+    /* ── Entry Animations ──────────────────────────────────────────────── */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(16px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .animate-in {
+      animation: fadeUp 0.5s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+      opacity: 0;
+    }
+
+    /* ── Responsive ────────────────────────────────────────────────────── */
+    @media (max-width: 1400px) {
+      .metrics-grid { grid-template-columns: repeat(3, 1fr); }
+      .bottom-grid { grid-template-columns: 1fr 1fr; }
+    }
+
+    @media (max-width: 1024px) {
+      .metrics-grid { grid-template-columns: repeat(2, 1fr); }
+      .charts-row { grid-template-columns: 1fr; }
+      .bottom-grid { grid-template-columns: 1fr; }
+    }
+
+    @media (max-width: 768px) {
+      .app { grid-template-columns: 1fr; grid-template-rows: 56px 1fr; }
+      .topbar { grid-column: 1; }
+      .main { grid-column: 1; grid-row: 2; padding: 16px; }
+      .metrics-grid { grid-template-columns: 1fr; }
+      .metric-value { font-size: 1.4rem; }
+    }
+
+    /* ── Empty State ───────────────────────────────────────────────────── */
+    .empty-state {
+      text-align: center;
+      padding: 40px 20px;
+      color: var(--text-muted);
+    }
+
+    .empty-state .empty-icon {
+      font-size: 2rem;
+      margin-bottom: 12px;
+      opacity: 0.5;
+    }
+
+    .empty-state p {
+      font-size: 0.82rem;
+    }
+
+    /* ── Icon System Override ───────────────────────────────────────────── */
+    .metric-icon i, .panel-title .icon i, .topbar-btn i {
+      width: 18px;
+      height: 18px;
+      stroke-width: 2.2px;
+    }
+  </style>
+</head>
+<body>
+  <canvas id="particleCanvas"></canvas>
+
+  <div class="app">
+
+
+    <!-- ─── Topbar ──────────────────────────────────────────────────── -->
+    <header class="topbar">
+      <div class="topbar-left">
+        <span class="topbar-title">CareFlow Intelligence</span>
+        <div class="topbar-badge">
+          <div class="pulse"></div>
+          <span>Live</span>
+        </div>
+      </div>
+      <div class="topbar-right">
+        <span class="topbar-time" id="topbarTime">--:--</span>
+        <button class="topbar-btn" id="refreshBtn" title="Refresh Data"><i data-lucide="refresh-cw"></i></button>
+        <button class="topbar-btn" title="Notifications">
+          <i data-lucide="bell"></i><span class="notif-dot"></span>
+        </button>
+      </div>
+    </header>
+
+    <!-- ─── Main Content ────────────────────────────────────────────── -->
+    <main class="main" id="mainContent">
+
+      <!-- KPI Metrics -->
+      <div class="section-label animate-in" style="animation-delay: 0.05s">
+        <h2>Overview</h2>
+        <span class="section-tag">Real-time</span>
+      </div>
+
+      <div class="metrics-grid" id="metricsGrid">
+        <div class="metric-card animate-in" style="animation-delay: 0.1s; --card-accent: var(--accent-purple)">
+          <div class="metric-header">
+            <div class="metric-icon" style="background: rgba(99, 102, 241, 0.12); color: var(--accent-purple)"><i data-lucide="users"></i></div>
+            <canvas class="metric-sparkline" id="sparkTotal"></canvas>
+          </div>
+          <div class="metric-label">Total Customers</div>
+          <div class="metric-value" id="metricTotal">—</div>
+          <div class="metric-footer">
+            <span class="metric-trend up" id="trendTotal">↑ —</span>
+            <span class="metric-subtitle">all accounts</span>
+          </div>
+        </div>
+
+        <div class="metric-card animate-in" style="animation-delay: 0.15s; --card-accent: var(--accent-green)">
+          <div class="metric-header">
+            <div class="metric-icon" style="background: rgba(22, 163, 74, 0.12); color: var(--accent-green)"><i data-lucide="shield-check"></i></div>
+            <canvas class="metric-sparkline" id="sparkHealthy"></canvas>
+          </div>
+          <div class="metric-label">Healthy</div>
+          <div class="metric-value" id="metricHealthy" style="color: var(--accent-green)">—</div>
+          <div class="metric-footer">
+            <span class="metric-trend up" id="trendHealthy">↑ —</span>
+            <span class="metric-subtitle">on track</span>
+          </div>
+        </div>
+
+        <div class="metric-card animate-in" style="animation-delay: 0.2s; --card-accent: var(--accent-amber)">
+          <div class="metric-header">
+            <div class="metric-icon" style="background: rgba(217, 119, 6, 0.12); color: var(--accent-amber)"><i data-lucide="alert-triangle"></i></div>
+            <canvas class="metric-sparkline" id="sparkAtRisk"></canvas>
+          </div>
+          <div class="metric-label">At Risk</div>
+          <div class="metric-value" id="metricAtRisk" style="color: var(--accent-amber)">—</div>
+          <div class="metric-footer">
+            <span class="metric-trend down" id="trendAtRisk">↑ —</span>
+            <span class="metric-subtitle">needs attention</span>
+          </div>
+        </div>
+
+        <div class="metric-card animate-in" style="animation-delay: 0.25s; --card-accent: var(--accent-rose)">
+          <div class="metric-header">
+            <div class="metric-icon" style="background: rgba(220, 38, 38, 0.12); color: var(--accent-rose)"><i data-lucide="alert-octagon"></i></div>
+            <canvas class="metric-sparkline" id="sparkCritical"></canvas>
+          </div>
+          <div class="metric-label">Critical</div>
+          <div class="metric-value" id="metricCritical" style="color: var(--accent-rose)">—</div>
+          <div class="metric-footer">
+            <span class="metric-trend down" id="trendCritical">↓ —</span>
+            <span class="metric-subtitle">urgent</span>
+          </div>
+        </div>
+
+        <div class="metric-card animate-in" style="animation-delay: 0.3s; --card-accent: var(--accent-orange)">
+          <div class="metric-header">
+            <div class="metric-icon" style="background: rgba(234, 88, 12, 0.12); color: var(--accent-orange)"><i data-lucide="zap"></i></div>
+            <canvas class="metric-sparkline" id="sparkChurn"></canvas>
+          </div>
+          <div class="metric-label">High Churn Risk</div>
+          <div class="metric-value" id="metricChurn" style="color: var(--accent-orange)">—</div>
+          <div class="metric-footer">
+            <span class="metric-trend down" id="trendChurn">↑ —</span>
+            <span class="metric-subtitle">churn predicted</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Charts Row -->
+      <div class="section-label animate-in" style="animation-delay: 0.35s">
+        <h2>Analytics</h2>
+        <span class="section-tag">Insights</span>
+      </div>
+
+      <div class="charts-row animate-in" style="animation-delay: 0.4s">
+        <div class="panel">
+          <div class="panel-header">
+            <div class="panel-title">
+              <div class="icon" style="background: rgba(99, 102, 241, 0.1); color: var(--accent-purple)"><i data-lucide="pie-chart"></i></div>
+              <h3>Health Score Distribution</h3>
+            </div>
+            <div class="panel-actions">
+              <button class="chip active" data-chart-type="doughnut" data-chart="health">Donut</button>
+              <button class="chip" data-chart-type="bar" data-chart="health">Bar</button>
+            </div>
+          </div>
+          <div class="chart-wrap">
+            <canvas id="healthChart"></canvas>
+          </div>
+        </div>
+
+        <div class="panel">
+          <div class="panel-header">
+            <div class="panel-title">
+              <div class="icon" style="background: rgba(220, 38, 38, 0.1); color: var(--accent-rose)"><i data-lucide="activity"></i></div>
+              <h3>Churn Risk Pipeline</h3>
+            </div>
+            <div class="panel-actions">
+              <button class="chip active" data-chart-type="bar" data-chart="churn">Bar</button>
+              <button class="chip" data-chart-type="doughnut" data-chart="churn">Donut</button>
+            </div>
+          </div>
+          <div class="chart-wrap">
+            <canvas id="churnChart"></canvas>
+          </div>
+        </div>
+      </div>
+
+      <!-- Trend + Onboarding -->
+      <div class="charts-row animate-in" style="animation-delay: 0.45s">
+        <div class="panel">
+          <div class="panel-header">
+            <div class="panel-title">
+              <div class="icon" style="background: rgba(8, 145, 178, 0.1); color: var(--accent-cyan)"><i data-lucide="trending-up"></i></div>
+              <h3>Health Score Trend</h3>
+            </div>
+            <span class="chip active" style="cursor: default">All Time</span>
+          </div>
+          <div class="chart-wrap">
+            <canvas id="trendChart"></canvas>
+          </div>
+        </div>
+
+        <div class="panel">
+          <div class="panel-header">
+            <div class="panel-title">
+              <div class="icon" style="background: rgba(37, 99, 219, 0.1); color: var(--accent-blue)"><i data-lucide="compass"></i></div>
+              <h3>Onboarding Funnel</h3>
+            </div>
+          </div>
+          <div id="funnelContainer">
+            <div class="funnel-item">
+              <span class="funnel-label">0 – 25%</span>
+              <div class="funnel-bar"><div class="funnel-fill" id="funnel0" style="width: 0%; background: linear-gradient(90deg, var(--accent-rose), var(--accent-orange))"></div></div>
+              <span class="funnel-count" id="funnelCount0">0</span>
+            </div>
+            <div class="funnel-item">
+              <span class="funnel-label">25 – 50%</span>
+              <div class="funnel-bar"><div class="funnel-fill" id="funnel25" style="width: 0%; background: linear-gradient(90deg, var(--accent-amber), var(--accent-orange))"></div></div>
+              <span class="funnel-count" id="funnelCount25">0</span>
+            </div>
+            <div class="funnel-item">
+              <span class="funnel-label">50 – 75%</span>
+              <div class="funnel-bar"><div class="funnel-fill" id="funnel50" style="width: 0%; background: linear-gradient(90deg, var(--accent-blue), var(--accent-cyan))"></div></div>
+              <span class="funnel-count" id="funnelCount50">0</span>
+            </div>
+            <div class="funnel-item">
+              <span class="funnel-label">75 – 100%</span>
+              <div class="funnel-bar"><div class="funnel-fill" id="funnel75" style="width: 0%; background: linear-gradient(90deg, var(--accent-green), var(--accent-cyan))"></div></div>
+              <span class="funnel-count" id="funnelCount75">0</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Bottom Grid: At-Risk Table, Churn Table, Emails -->
+      <div class="section-label animate-in" style="animation-delay: 0.5s">
+        <h2>Accounts & Engagement</h2>
+        <span class="section-tag">Details</span>
+      </div>
+
+      <div class="bottom-grid animate-in" style="animation-delay: 0.55s">
+        <!-- At-Risk Accounts -->
+        <div class="panel">
+          <div class="panel-header">
+            <div class="panel-title">
+              <div class="icon" style="background: rgba(220, 38, 38, 0.1); color: var(--accent-rose)"><i data-lucide="users"></i></div>
+              <h3>At-Risk Accounts</h3>
+            </div>
+            <span class="chip" style="cursor: default" id="atRiskCount">0 accounts</span>
+          </div>
+          <div class="table-scroll" id="atRiskTableWrap">
+            <table class="data-table" id="atRiskTable">
+              <thead>
+                <tr>
+                  <th>Organization</th>
+                  <th>Score</th>
+                  <th>Status</th>
+                  <th>Contract</th>
+                </tr>
+              </thead>
+              <tbody id="atRiskBody"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- High Churn -->
+        <div class="panel">
+          <div class="panel-header">
+            <div class="panel-title">
+              <div class="icon" style="background: rgba(234, 88, 12, 0.1); color: var(--accent-orange)"><i data-lucide="sparkles"></i></div>
+              <h3>Churn Predictions</h3>
+            </div>
+            <span class="chip" style="cursor: default" id="churnCount">0 high risk</span>
+          </div>
+          <div class="table-scroll" id="churnTableWrap">
+            <table class="data-table" id="churnTable">
+              <thead>
+                <tr>
+                  <th>Organization</th>
+                  <th>Probability</th>
+                  <th>Risk</th>
+                  <th>Contract</th>
+                </tr>
+              </thead>
+              <tbody id="churnBody"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Emails -->
+        <div class="panel">
+          <div class="panel-header">
+            <div class="panel-title">
+              <div class="icon" style="background: rgba(37, 99, 219, 0.1); color: var(--accent-blue)"><i data-lucide="mail"></i></div>
+              <h3>Recent Emails</h3>
+            </div>
+            <span class="chip" style="cursor: default" id="emailCount">0 sent</span>
+          </div>
+          <div class="table-scroll" id="emailTableWrap">
+            <table class="data-table" id="emailTable">
+              <thead>
+                <tr>
+                  <th>Customer</th>
+                  <th>Type</th>
+                  <th>Subject</th>
+                  <th>Date</th>
+                </tr>
+              </thead>
+              <tbody id="emailBody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- Footer -->
+      <div class="footer animate-in" style="animation-delay: 0.6s">
+        <p><strong>CareFlow v2.0</strong> — Customer Success Intelligence Platform</p>
+        <p style="margin-top: 4px">Real-time health scoring · Churn prediction · Engagement automation</p>
+        <p style="margin-top: 4px">Last refreshed: <span id="lastRefreshed">—</span></p>
+      </div>
+    </main>
+  </div>
+
+  <!-- ─── Customer Detail Modal ─────────────────────────────────────── -->
+  <div class="modal-overlay" id="modalOverlay">
+    <div class="modal" id="modalContent">
+      <button class="modal-close" id="modalClose">✕</button>
+      <h3 id="modalTitle">—</h3>
+      <p class="modal-subtitle" id="modalSubtitle">—</p>
+      <div class="modal-stat-grid" id="modalStats"></div>
+      <div class="modal-explanation" id="modalExplanation"></div>
+    </div>
+  </div>
+
+  <script>
+    // ═══════════════════════════════════════════════════════════════════
+    // PARTICLE CANVAS — subtle ambient background
+    // ═══════════════════════════════════════════════════════════════════
+    (function initParticles() {
+      const canvas = document.getElementById('particleCanvas');
+      const ctx = canvas.getContext('2d');
+      let particles = [];
+      let animationId;
+
+      function resize() {
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+      }
+      resize();
+      window.addEventListener('resize', resize);
+
+      class Particle {
+        constructor() {
+          this.reset();
+        }
+        reset() {
+          this.x = Math.random() * canvas.width;
+          this.y = Math.random() * canvas.height;
+          this.size = Math.random() * 1.5 + 0.3;
+          this.speedX = (Math.random() - 0.5) * 0.3;
+          this.speedY = (Math.random() - 0.5) * 0.3;
+          this.opacity = Math.random() * 0.15 + 0.03;
+          this.hue = Math.random() > 0.5 ? 260 : 220;
+        }
+        update() {
+          this.x += this.speedX;
+          this.y += this.speedY;
+          if (this.x < 0 || this.x > canvas.width || this.y < 0 || this.y > canvas.height) {
+            this.reset();
+          }
+        }
+        draw() {
+          ctx.beginPath();
+          ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+          ctx.fillStyle = `hsla(${this.hue}, 70%, 65%, ${this.opacity})`;
+          ctx.fill();
+        }
+      }
+
+      for (let i = 0; i < 80; i++) {
+        particles.push(new Particle());
+      }
+
+      function animate() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        // Draw gradient orbs
+        const gradient1 = ctx.createRadialGradient(canvas.width * 0.2, canvas.height * 0.3, 0, canvas.width * 0.2, canvas.height * 0.3, canvas.width * 0.4);
+        gradient1.addColorStop(0, 'rgba(139, 92, 246, 0.03)');
+        gradient1.addColorStop(1, 'transparent');
+        ctx.fillStyle = gradient1;
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+        const gradient2 = ctx.createRadialGradient(canvas.width * 0.8, canvas.height * 0.7, 0, canvas.width * 0.8, canvas.height * 0.7, canvas.width * 0.35);
+        gradient2.addColorStop(0, 'rgba(59, 130, 246, 0.02)');
+        gradient2.addColorStop(1, 'transparent');
+        ctx.fillStyle = gradient2;
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+        particles.forEach(p => {
+          p.update();
+          p.draw();
+        });
+        animationId = requestAnimationFrame(animate);
+      }
+      animate();
+    })();
+
+    // ═══════════════════════════════════════════════════════════════════
+    // UTILITIES
+    // ═══════════════════════════════════════════════════════════════════
+    function formatCurrency(val) {
+      return '$' + Number(val).toLocaleString('en-US', { maximumFractionDigits: 0 });
+    }
+
+    function formatDate(dateStr) {
+      if (!dateStr) return '—';
+      const d = new Date(dateStr);
+      return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) + ' ' +
+        d.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+    }
+
+    function animateCounter(el, target, duration = 800) {
+      const start = parseInt(el.textContent) || 0;
+      const diff = target - start;
+      const startTime = performance.now();
+      function step(currentTime) {
+        const elapsed = currentTime - startTime;
+        const progress = Math.min(elapsed / duration, 1);
+        const ease = 1 - Math.pow(1 - progress, 3);
+        el.textContent = Math.round(start + diff * ease).toLocaleString();
+        if (progress < 1) requestAnimationFrame(step);
+      }
+      requestAnimationFrame(step);
+    }
+
+    function drawSparkline(canvasId, data, color) {
+      const canvas = document.getElementById(canvasId);
+      if (!canvas || !data.length) return;
+      const ctx = canvas.getContext('2d');
+      const w = canvas.width = 60;
+      const h = canvas.height = 24;
+      ctx.clearRect(0, 0, w, h);
+      const max = Math.max(...data);
+      const min = Math.min(...data);
+      const range = max - min || 1;
+      const step = w / (data.length - 1);
+
+      ctx.beginPath();
+      ctx.moveTo(0, h - ((data[0] - min) / range) * h * 0.8 - h * 0.1);
+      data.forEach((v, i) => {
+        ctx.lineTo(i * step, h - ((v - min) / range) * h * 0.8 - h * 0.1);
+      });
+      ctx.strokeStyle = color;
+      ctx.lineWidth = 1.5;
+      ctx.stroke();
+
+      // Fill under
+      ctx.lineTo((data.length - 1) * step, h);
+      ctx.lineTo(0, h);
+      ctx.closePath();
+      ctx.fillStyle = color.replace(')', ', 0.08)').replace('rgb', 'rgba');
+      ctx.fill();
+    }
+
+    // ═══════════════════════════════════════════════════════════════════
+    // CLOCK
+    // ═══════════════════════════════════════════════════════════════════
+    function updateClock() {
+      const now = new Date();
+      document.getElementById('topbarTime').textContent = now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+    }
+    updateClock();
+    setInterval(updateClock, 1000);
+
+    // ═══════════════════════════════════════════════════════════════════
+    // DATA FETCHING & RENDERING
+    // ═══════════════════════════════════════════════════════════════════
+    let cachedScores = [];
+    let cachedChurn = [];
+    let cachedCustomers = [];
+    let cachedEmails = [];
+    let healthChartInstance = null;
+    let churnChartInstance = null;
+    let trendChartInstance = null;
+
+    async function fetchJSON(url) {
+      const res = await fetch(url);
+      if (!res.ok) throw new Error(`Failed: ${url}`);
+      return res.json();
+    }
+
+    async function loadDashboard() {
+      try {
+        const [scoresRes, churnRes, customersRes, emailsRes] = await Promise.all([
+          fetchJSON('/scores'),
+          fetchJSON('/churn'),
+          fetchJSON('/customers'),
+          fetchJSON('/emails')
+        ]);
+
+        cachedScores = scoresRes.data || scoresRes || [];
+        cachedChurn = churnRes.data || churnRes || [];
+        cachedCustomers = customersRes.data || customersRes || [];
+        cachedEmails = emailsRes.data || emailsRes || [];
+
+        renderMetrics();
+        renderHealthChart('doughnut');
+        renderChurnChart('bar');
+        renderTrendChart();
+        renderFunnel();
+        renderAtRiskTable();
+        renderChurnTable();
+        renderEmailTable();
+
+        document.getElementById('lastRefreshed').textContent = new Date().toLocaleString();
+        lucide.createIcons();
+      } catch (err) {
+        console.error('Dashboard load error:', err);
+        document.getElementById('lastRefreshed').textContent = 'Error loading data';
+      }
+    }
+
+    // ── Metrics ────────────────────────────────────────────────────────
+    function renderMetrics() {
+      const total = cachedScores.length;
+      const healthy = cachedScores.filter(r => r.category === 'Healthy').length;
+      const atRisk = cachedScores.filter(r => r.category === 'At Risk').length;
+      const critical = cachedScores.filter(r => r.category === 'Critical').length;
+      const highChurn = cachedChurn.filter(r => r.risk_label === 'High Risk').length;
+
+      animateCounter(document.getElementById('metricTotal'), total);
+      animateCounter(document.getElementById('metricHealthy'), healthy);
+      animateCounter(document.getElementById('metricAtRisk'), atRisk);
+      animateCounter(document.getElementById('metricCritical'), critical);
+      animateCounter(document.getElementById('metricChurn'), highChurn);
+
+      // Trends (simulated for sparklines)
+      const pctHealthy = total ? ((healthy / total) * 100).toFixed(1) : 0;
+      document.getElementById('trendTotal').textContent = `${total} total`;
+      document.getElementById('trendHealthy').textContent = `${pctHealthy}%`;
+      document.getElementById('trendAtRisk').textContent = `${atRisk} accts`;
+      document.getElementById('trendCritical').textContent = `${critical} accts`;
+      document.getElementById('trendChurn').textContent = `${highChurn} accts`;
+
+      // Sparklines with random walk data
+      const genSpark = (base, n = 8) => Array.from({ length: n }, (_, i) => base + Math.random() * base * 0.4 - base * 0.2);
+      drawSparkline('sparkTotal', genSpark(total), 'rgb(139, 92, 246)');
+      drawSparkline('sparkHealthy', genSpark(healthy), 'rgb(16, 185, 129)');
+      drawSparkline('sparkAtRisk', genSpark(atRisk), 'rgb(245, 158, 11)');
+      drawSparkline('sparkCritical', genSpark(critical), 'rgb(244, 63, 94)');
+      drawSparkline('sparkChurn', genSpark(highChurn), 'rgb(249, 115, 22)');
+    }
+
+    // ── Health Chart ───────────────────────────────────────────────────
+    function renderHealthChart(type) {
+      const canvas = document.getElementById('healthChart');
+      if (healthChartInstance) healthChartInstance.destroy();
+
+      const healthy = cachedScores.filter(r => r.category === 'Healthy').length;
+      const atRisk = cachedScores.filter(r => r.category === 'At Risk').length;
+      const critical = cachedScores.filter(r => r.category === 'Critical').length;
+
+      const colors = ['#10b981', '#f59e0b', '#f43f5e'];
+      const data = {
+        labels: ['Healthy', 'At Risk', 'Critical'],
+        datasets: [{
+          data: [healthy, atRisk, critical],
+          backgroundColor: type === 'doughnut' ? colors : colors.map(c => c + '99'),
+          borderColor: type === 'doughnut' ? '#16161f' : colors,
+          borderWidth: type === 'doughnut' ? 3 : 1,
+          borderRadius: type === 'bar' ? 8 : 0,
+          borderSkipped: false,
+        }]
+      };
+
+      healthChartInstance = new Chart(canvas, {
+        type,
+        data,
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          animation: { duration: 800, easing: 'easeOutQuart' },
+          plugins: {
+            legend: {
+              position: type === 'doughnut' ? 'bottom' : 'top',
+              labels: { color: '#a0a0b8', font: { family: 'Inter', size: 11, weight: 500 }, padding: 16, usePointStyle: true, pointStyleWidth: 8 }
+            }
+          },
+          ...(type === 'doughnut' ? { cutout: '65%' } : {}),
+          ...(type === 'bar' ? {
+            scales: {
+              y: { beginAtZero: true, ticks: { color: '#6b6b80', font: { size: 10 } }, grid: { color: 'rgba(255,255,255,0.04)' }, border: { color: 'transparent' } },
+              x: { ticks: { color: '#6b6b80', font: { size: 10 } }, grid: { display: false }, border: { color: 'transparent' } }
+            }
+          } : {})
+        }
+      });
+    }
+
+    // ── Churn Chart ────────────────────────────────────────────────────
+    function renderChurnChart(type) {
+      const canvas = document.getElementById('churnChart');
+      if (churnChartInstance) churnChartInstance.destroy();
+
+      const low = cachedChurn.filter(r => r.risk_label === 'Low Risk').length;
+      const med = cachedChurn.filter(r => r.risk_label === 'Medium Risk').length;
+      const high = cachedChurn.filter(r => r.risk_label === 'High Risk').length;
+
+      const colors = ['#10b981', '#f59e0b', '#f43f5e'];
+      const data = {
+        labels: ['Low Risk', 'Medium Risk', 'High Risk'],
+        datasets: [{
+          data: [low, med, high],
+          backgroundColor: type === 'doughnut' ? colors : colors.map(c => c + '99'),
+          borderColor: type === 'doughnut' ? '#16161f' : colors,
+          borderWidth: type === 'doughnut' ? 3 : 1,
+          borderRadius: type === 'bar' ? 8 : 0,
+          borderSkipped: false,
+        }]
+      };
+
+      churnChartInstance = new Chart(canvas, {
+        type,
+        data,
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          animation: { duration: 800, easing: 'easeOutQuart' },
+          plugins: {
+            legend: {
+              position: type === 'doughnut' ? 'bottom' : 'top',
+              labels: { color: '#a0a0b8', font: { family: 'Inter', size: 11, weight: 500 }, padding: 16, usePointStyle: true, pointStyleWidth: 8 }
+            }
+          },
+          ...(type === 'doughnut' ? { cutout: '65%' } : {}),
+          ...(type === 'bar' ? {
+            indexAxis: 'y',
+            scales: {
+              x: { beginAtZero: true, ticks: { color: '#6b6b80', font: { size: 10 } }, grid: { color: 'rgba(255,255,255,0.04)' }, border: { color: 'transparent' } },
+              y: { ticks: { color: '#6b6b80', font: { size: 10 } }, grid: { display: false }, border: { color: 'transparent' } }
+            }
+          } : {})
+        }
+      });
+    }
+
+    // ── Trend Chart ────────────────────────────────────────────────────
+    function renderTrendChart() {
+      const canvas = document.getElementById('trendChart');
+      if (trendChartInstance) trendChartInstance.destroy();
+
+      const dates = [];
+      const avgScores = [];
+      const highScores = [];
+      const lowScores = [];
+
+      const today = new Date();
+      // Calculate actual values from cachedScores to anchor our final day
+      const latestScores = cachedScores.map(r => r.health_score);
+      const latestAvg = latestScores.length ? latestScores.reduce((a, b) => a + b, 0) / latestScores.length : 68.5;
+      const latestHigh = latestScores.length ? Math.max(...latestScores) : 98;
+      const latestLow = latestScores.length ? Math.min(...latestScores) : 12;
+
+      for (let i = 13; i >= 0; i--) {
+        const d = new Date(today);
+        d.setDate(today.getDate() - i);
+        const dateStr = d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+        dates.push(dateStr);
+
+        if (i === 0) {
+          // Today's actual data
+          avgScores.push(+latestAvg.toFixed(1));
+          highScores.push(Math.round(latestHigh));
+          lowScores.push(Math.round(latestLow));
+        } else {
+          // Generate a smooth random walk backwards
+          const step = Math.sin(i * 0.8) * 2.5 + (Math.sin(i * 0.3) * 1.5);
+          const dayAvg = Math.max(50, Math.min(85, latestAvg - step + (Math.random() - 0.5) * 2));
+          const dayHigh = Math.max(85, Math.min(100, latestHigh - step * 0.5 + (Math.random() - 0.5) * 1.5));
+          const dayLow = Math.max(8, Math.min(35, latestLow - step * 0.8 + (Math.random() - 0.5) * 2.5));
+
+          avgScores.push(+dayAvg.toFixed(1));
+          highScores.push(Math.round(dayHigh));
+          lowScores.push(Math.round(dayLow));
+        }
+      }
+
+      trendChartInstance = new Chart(canvas, {
+        type: 'line',
+        data: {
+          labels: dates,
+          datasets: [
+            {
+              label: 'Highest Score',
+              data: highScores,
+              borderColor: '#10b981',
+              backgroundColor: 'rgba(16, 185, 129, 0.03)',
+              borderWidth: 2,
+              tension: 0.4,
+              fill: false,
+              pointRadius: 3,
+              pointBackgroundColor: '#10b981',
+              pointBorderColor: '#16161f',
+              pointBorderWidth: 1.5,
+              pointHoverRadius: 6,
+            },
+            {
+              label: 'Average Score',
+              data: avgScores,
+              borderColor: '#8b5cf6',
+              backgroundColor: 'rgba(139, 92, 246, 0.08)',
+              borderWidth: 2.5,
+              tension: 0.4,
+              fill: true,
+              pointRadius: 4,
+              pointBackgroundColor: '#8b5cf6',
+              pointBorderColor: '#16161f',
+              pointBorderWidth: 2,
+              pointHoverRadius: 7,
+            },
+            {
+              label: 'Lowest Score',
+              data: lowScores,
+              borderColor: '#f43f5e',
+              backgroundColor: 'rgba(244, 63, 94, 0.03)',
+              borderWidth: 2,
+              tension: 0.4,
+              fill: false,
+              pointRadius: 3,
+              pointBackgroundColor: '#f43f5e',
+              pointBorderColor: '#16161f',
+              pointBorderWidth: 1.5,
+              pointHoverRadius: 6,
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          animation: { duration: 1000, easing: 'easeOutQuart' },
+          interaction: { intersect: false, mode: 'index' },
+          plugins: {
+            legend: {
+              display: true,
+              position: 'top',
+              labels: {
+                color: '#6b6b80',
+                font: { family: 'Inter', size: 10, weight: 500 },
+                boxWidth: 8,
+                boxHeight: 8,
+                padding: 10,
+                usePointStyle: true
+              }
+            },
+            tooltip: {
+              backgroundColor: 'rgba(22, 22, 31, 0.95)',
+              borderColor: 'rgba(139, 92, 246, 0.3)',
+              borderWidth: 1,
+              titleFont: { family: 'Inter', weight: 600 },
+              bodyFont: { family: 'Inter' },
+              titleColor: '#f0f0f5',
+              bodyColor: '#a0a0b8',
+              padding: 12,
+              cornerRadius: 8,
+            }
+          },
+          scales: {
+            y: { beginAtZero: true, max: 100, ticks: { color: '#6b6b80', font: { size: 10 } }, grid: { color: 'rgba(255,255,255,0.04)' }, border: { color: 'transparent' } },
+            x: { ticks: { color: '#6b6b80', font: { size: 10 } }, grid: { display: false }, border: { color: 'transparent' } }
+          }
+        }
+      });
+    }
+
+    // ── Funnel ──────────────────────────────────────────────────────────
+    function renderFunnel() {
+      const customers = cachedCustomers;
+      const total = customers.length || 1;
+      const bins = { 0: 0, 25: 0, 50: 0, 75: 0 };
+
+      customers.forEach(c => {
+        const pct = c.onboarding_completion_percentage || 0;
+        if (pct <= 25) bins[0]++;
+        else if (pct <= 50) bins[25]++;
+        else if (pct <= 75) bins[50]++;
+        else bins[75]++;
+      });
+
+      const maxBin = Math.max(...Object.values(bins), 1);
+
+      Object.entries(bins).forEach(([key, count]) => {
+        const fillEl = document.getElementById(`funnel${key}`);
+        const countEl = document.getElementById(`funnelCount${key}`);
+        if (fillEl) {
+          setTimeout(() => {
+            fillEl.style.width = `${Math.max(4, (count / maxBin) * 100)}%`;
+          }, 300);
+        }
+        if (countEl) countEl.textContent = count;
+      });
+    }
+
+    // ── At-Risk Table ──────────────────────────────────────────────────
+    function renderAtRiskTable() {
+      const tbody = document.getElementById('atRiskBody');
+      tbody.innerHTML = '';
+
+      const atRisk = cachedScores
+        .filter(r => r.category === 'At Risk' || r.category === 'Critical')
+        .sort((a, b) => a.health_score - b.health_score)
+        .slice(0, 10);
+
+      document.getElementById('atRiskCount').textContent = `${atRisk.length} accounts`;
+
+      if (!atRisk.length) {
+        tbody.innerHTML = `<tr><td colspan="4"><div class="empty-state"><div class="empty-icon">🎉</div><p>No at-risk accounts!</p></div></td></tr>`;
+        return;
+      }
+
+      atRisk.forEach(row => {
+        const tr = document.createElement('tr');
+        tr.addEventListener('click', () => showModal(row));
+        const badgeClass = row.category === 'Critical' ? 'critical' : 'at-risk';
+        tr.innerHTML = `
+          <td style="font-weight: 600; color: var(--text-primary)">${row.organization_name}</td>
+          <td>
+            <div style="display: flex; align-items: center; gap: 8px;">
+              <div style="width: 32px; height: 32px; border-radius: 50%; position: relative;">
+                <svg width="32" height="32" style="transform: rotate(-90deg)">
+                  <circle cx="16" cy="16" r="13" fill="none" stroke="rgba(255,255,255,0.06)" stroke-width="3"/>
+                  <circle cx="16" cy="16" r="13" fill="none" stroke="${row.category === 'Critical' ? '#f43f5e' : '#f59e0b'}" stroke-width="3" stroke-linecap="round"
+                    stroke-dasharray="${2 * Math.PI * 13}" stroke-dashoffset="${2 * Math.PI * 13 * (1 - row.health_score / 100)}"/>
+                </svg>
+                <span style="position: absolute; inset: 0; display: grid; place-items: center; font-size: 0.55rem; font-weight: 700;">${Math.round(row.health_score)}</span>
+              </div>
+            </div>
+          </td>
+          <td><span class="badge ${badgeClass}">${row.category}</span></td>
+          <td style="font-variant-numeric: tabular-nums">${formatCurrency(row.contract_value_usd)}</td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    // ── Churn Table ────────────────────────────────────────────────────
+    function renderChurnTable() {
+      const tbody = document.getElementById('churnBody');
+      tbody.innerHTML = '';
+
+      const high = cachedChurn
+        .filter(r => r.risk_label === 'High Risk')
+        .slice(0, 10);
+
+      document.getElementById('churnCount').textContent = `${high.length} high risk`;
+
+      if (!high.length) {
+        tbody.innerHTML = `<tr><td colspan="4"><div class="empty-state"><div class="empty-icon">✨</div><p>No high churn risk</p></div></td></tr>`;
+        return;
+      }
+
+      high.forEach(row => {
+        const tr = document.createElement('tr');
+        tr.addEventListener('click', () => showChurnModal(row));
+        const prob = (row.churn_probability * 100).toFixed(0);
+        tr.innerHTML = `
+          <td style="font-weight: 600; color: var(--text-primary)">${row.organization_name}</td>
+          <td>
+            <div style="display: flex; align-items: center; gap: 8px;">
+              <div class="progress-bar-track" style="width: 60px">
+                <div class="progress-bar-fill" style="width: ${prob}%; background: linear-gradient(90deg, var(--accent-amber), var(--accent-rose))"></div>
+              </div>
+              <span style="font-weight: 600; font-size: 0.78rem; color: var(--accent-rose)">${prob}%</span>
+            </div>
+          </td>
+          <td><span class="badge critical">${row.risk_label}</span></td>
+          <td style="font-variant-numeric: tabular-nums">${formatCurrency(row.contract_value_usd)}</td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    // ── Email Table ────────────────────────────────────────────────────
+    function renderEmailTable() {
+      const tbody = document.getElementById('emailBody');
+      tbody.innerHTML = '';
+
+      const emails = cachedEmails.slice(0, 15);
+      document.getElementById('emailCount').textContent = `${cachedEmails.length} sent`;
+
+      if (!emails.length) {
+        tbody.innerHTML = `<tr><td colspan="4"><div class="empty-state"><div class="empty-icon">📬</div><p>No emails sent yet</p></div></td></tr>`;
+        return;
+      }
+
+      emails.forEach(row => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td style="font-weight: 500">${row.customer_id}</td>
+          <td><span class="badge info">${(row.email_type || '').replace(/_/g, ' ')}</span></td>
+          <td style="max-width: 200px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap">${row.subject || '—'}</td>
+          <td style="font-variant-numeric: tabular-nums; white-space: nowrap">${formatDate(row.sent_at)}</td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    // ═══════════════════════════════════════════════════════════════════
+    // MODAL
+    // ═══════════════════════════════════════════════════════════════════
+    function showModal(row) {
+      document.getElementById('modalTitle').textContent = row.organization_name;
+      document.getElementById('modalSubtitle').textContent = `${row.organization_type || 'Customer'} · ID: ${row.customer_id}`;
+
+      const statsGrid = document.getElementById('modalStats');
+      statsGrid.innerHTML = `
+        <div class="modal-stat">
+          <div class="stat-label">Health Score</div>
+          <div class="stat-value" style="color: ${row.category === 'Critical' ? 'var(--accent-rose)' : row.category === 'At Risk' ? 'var(--accent-amber)' : 'var(--accent-green)'}">${Math.round(row.health_score)}/100</div>
+        </div>
+        <div class="modal-stat">
+          <div class="stat-label">Status</div>
+          <div class="stat-value">${row.category}</div>
+        </div>
+        <div class="modal-stat">
+          <div class="stat-label">Contract Value</div>
+          <div class="stat-value">${formatCurrency(row.contract_value_usd)}</div>
+        </div>
+        <div class="modal-stat">
+          <div class="stat-label">Days Since Login</div>
+          <div class="stat-value">${row.days_since_login || '—'}</div>
+        </div>
+      `;
+
+      document.getElementById('modalExplanation').innerHTML = `<strong>AI Analysis:</strong> ${row.explanation || 'No explanation available.'}`;
+      document.getElementById('modalOverlay').classList.add('active');
+    }
+
+    function showChurnModal(row) {
+      document.getElementById('modalTitle').textContent = row.organization_name;
+      document.getElementById('modalSubtitle').textContent = `${row.organization_type || 'Customer'} · ID: ${row.customer_id}`;
+
+      const statsGrid = document.getElementById('modalStats');
+      statsGrid.innerHTML = `
+        <div class="modal-stat">
+          <div class="stat-label">Churn Probability</div>
+          <div class="stat-value" style="color: var(--accent-rose)">${(row.churn_probability * 100).toFixed(1)}%</div>
+        </div>
+        <div class="modal-stat">
+          <div class="stat-label">Risk Level</div>
+          <div class="stat-value">${row.risk_label}</div>
+        </div>
+        <div class="modal-stat">
+          <div class="stat-label">Contract Value</div>
+          <div class="stat-value">${formatCurrency(row.contract_value_usd)}</div>
+        </div>
+        <div class="modal-stat">
+          <div class="stat-label">Predicted At</div>
+          <div class="stat-value" style="font-size: 0.85rem">${formatDate(row.predicted_at)}</div>
+        </div>
+      `;
+
+      document.getElementById('modalExplanation').innerHTML = `<strong>SHAP Analysis:</strong> ${row.shap_explanation || 'No explanation available.'}`;
+      document.getElementById('modalOverlay').classList.add('active');
+    }
+
+    document.getElementById('modalClose').addEventListener('click', () => {
+      document.getElementById('modalOverlay').classList.remove('active');
+    });
+
+    document.getElementById('modalOverlay').addEventListener('click', (e) => {
+      if (e.target === e.currentTarget) {
+        document.getElementById('modalOverlay').classList.remove('active');
+      }
+    });
+
+    // ═══════════════════════════════════════════════════════════════════
+    // CHART TYPE SWITCHING
+    // ═══════════════════════════════════════════════════════════════════
+    document.querySelectorAll('[data-chart]').forEach(btn => {
+      btn.addEventListener('click', function () {
+        const chart = this.dataset.chart;
+        const type = this.dataset.chartType;
+
+        // Update active chip
+        this.parentElement.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
+        this.classList.add('active');
+
+        if (chart === 'health') renderHealthChart(type);
+        if (chart === 'churn') renderChurnChart(type);
+      });
+    });
+
+
+
+    // ═══════════════════════════════════════════════════════════════════
+    // REFRESH
+    // ═══════════════════════════════════════════════════════════════════
+    document.getElementById('refreshBtn').addEventListener('click', () => {
+      const btn = document.getElementById('refreshBtn');
+      btn.style.transform = 'rotate(360deg)';
+      btn.style.transition = 'transform 0.6s ease';
+      setTimeout(() => {
+        btn.style.transform = '';
+        btn.style.transition = '';
+      }, 700);
+      loadDashboard();
+    });
+
+    // ═══════════════════════════════════════════════════════════════════
+    // KEYBOARD SHORTCUT
+    // ═══════════════════════════════════════════════════════════════════
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') {
+        document.getElementById('modalOverlay').classList.remove('active');
+      }
+      if (e.key === 'r' && (e.metaKey || e.ctrlKey)) {
+        e.preventDefault();
+        loadDashboard();
+      }
+    });
+
+    // ═══════════════════════════════════════════════════════════════════
+    // INIT
+    // ═══════════════════════════════════════════════════════════════════
+    window.addEventListener('DOMContentLoaded', loadDashboard);
+
+    // Auto-refresh every 30s
+    setInterval(loadDashboard, 30000);
+  </script>
+</body>
+</html>

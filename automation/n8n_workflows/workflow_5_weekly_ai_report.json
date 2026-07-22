@@ -1,0 +1,93 @@
+{
+  "name": "CareFlow Workflow 5: Weekly AI Report",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "cronExpression",
+              "expression": "0 9 * * 1"
+            }
+          ]
+        }
+      },
+      "id": "trigger",
+      "name": "Every Monday (9 AM)",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.1,
+      "position": [100, 300]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://host.docker.internal:8000/report/weekly/run",
+        "options": {}
+      },
+      "id": "get_report",
+      "name": "Generate Weekly AI Report",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [300, 300]
+    },
+    {
+      "parameters": {
+        "fromEmail": "REPLACE_WITH_YOUR_EMAIL",
+        "toEmail": "REPLACE_WITH_YOUR_EMAIL",
+        "subject": "CareFlow Customer Success Weekly AI Executive Briefing",
+        "html": "={{ $json.report }}",
+        "options": {}
+      },
+      "id": "send_email",
+      "name": "Send AI Report via Email",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [550, 200]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "REPLACE_WITH_SLACK_WEBHOOK_URL",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "{\n  \"text\": \"*CareFlow Customer Success Weekly Executive Briefing*\\n\\n{{ $json.report.replace(/\\n/g, '\\\\n') }}\"\n}",
+        "options": {}
+      },
+      "id": "slack_webhook",
+      "name": "Post Report to Slack",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [550, 400]
+    }
+  ],
+  "connections": {
+    "Every Monday (9 AM)": {
+      "main": [
+        [
+          {
+            "node": "Generate Weekly AI Report",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate Weekly AI Report": {
+      "main": [
+        [
+          {
+            "node": "Send AI Report via Email",
+            "index": 0
+          },
+          {
+            "node": "Post Report to Slack",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  }
+}

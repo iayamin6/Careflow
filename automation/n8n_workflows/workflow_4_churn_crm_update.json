@@ -1,0 +1,151 @@
+{
+  "name": "CareFlow Workflow 4: Churn CRM Update",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "cronExpression",
+              "expression": "0 11 * * *"
+            }
+          ]
+        }
+      },
+      "id": "trigger",
+      "name": "Daily Schedule (11 AM)",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.1,
+      "position": [100, 300]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://host.docker.internal:8000/churn/run",
+        "options": {}
+      },
+      "id": "run_churn",
+      "name": "Run Churn Pipeline",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [300, 200]
+    },
+    {
+      "parameters": {
+        "url": "http://host.docker.internal:8000/churn",
+        "options": {}
+      },
+      "id": "get_churn",
+      "name": "Get Churn Predictions",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [300, 300]
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "data",
+        "options": {}
+      },
+      "id": "split_customers",
+      "name": "For Each Customer",
+      "type": "n8n-nodes-base.itemLists",
+      "typeVersion": 2.1,
+      "position": [500, 300]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "string": [
+            {
+              "value1": "={{ $json.risk_label }}",
+              "operation": "equal",
+              "value2": "High Risk"
+            }
+          ]
+        }
+      },
+      "id": "check_risk",
+      "name": "High Risk?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [700, 300]
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "sheetId": "REPLACE_WITH_GOOGLE_SHEET_ID",
+        "range": "CRM Tasks!A:E",
+        "options": {
+          "valueInputMode": "USER_ENTERED"
+        }
+      },
+      "id": "log_sheets",
+      "name": "Create Follow-up Task in CRM",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.1,
+      "position": [950, 200],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "REPLACE_IN_N8N_UI",
+          "name": "Google Sheets OAuth2"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Daily Schedule (11 AM)": {
+      "main": [
+        [
+          {
+            "node": "Run Churn Pipeline",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Run Churn Pipeline": {
+      "main": [
+        [
+          {
+            "node": "Get Churn Predictions",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Churn Predictions": {
+      "main": [
+        [
+          {
+            "node": "For Each Customer",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "For Each Customer": {
+      "main": [
+        [
+          {
+            "node": "High Risk?",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "High Risk?": {
+      "main": [
+        [
+          {
+            "node": "Create Follow-up Task in CRM",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  }
+}
