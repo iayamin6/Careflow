@@ -1,0 +1,222 @@
+{
+  "churn": {
+    "name": "churn",
+    "version": "20261015022733",
+    "algorithm": "xgboost",
+    "synthetic_only": true,
+    "target": "No successful transaction in the next 30 days",
+    "features": [
+      "frequency",
+      "previous_frequency",
+      "recency",
+      "failure_rate",
+      "amount_mean",
+      "merchant_diversity",
+      "tenure"
+    ],
+    "selection_validation": {
+      "xgboost": {
+        "pr_auc": 0.39217420268864245,
+        "roc_auc": 0.7334692028985507,
+        "precision_at_0_5": 1.0,
+        "recall_at_0_5": 0.043478260869565216,
+        "brier": 0.1476908028125763,
+        "rows": 119,
+        "positive_rate": 0.19327731092436976
+      },
+      "lightgbm": {
+        "pr_auc": 0.3707577858908957,
+        "roc_auc": 0.7182971014492754,
+        "precision_at_0_5": 1.0,
+        "recall_at_0_5": 0.043478260869565216,
+        "brier": 0.15984696697601591,
+        "rows": 119,
+        "positive_rate": 0.19327731092436976
+      }
+    },
+    "test": {
+      "pr_auc": 0.492793591475893,
+      "roc_auc": 0.8187234042553192,
+      "precision_at_0_5": 0.5,
+      "recall_at_0_5": 0.04,
+      "brier": 0.13630889707818175,
+      "rows": 119,
+      "positive_rate": 0.21008403361344538
+    },
+    "baseline_test": {
+      "pr_auc": 0.21008403361344538,
+      "roc_auc": 0.5,
+      "precision_at_0_5": 0.0,
+      "recall_at_0_5": 0.0,
+      "brier": 0.16705185475550757,
+      "rows": 119,
+      "positive_rate": 0.21008403361344538
+    },
+    "splits": {
+      "train": {
+        "rows": 588,
+        "first": "2025-12-19T00:39:04.123868+00:00",
+        "last": "2026-04-18T00:39:04.123868+00:00"
+      },
+      "calibration": {
+        "rows": 119,
+        "first": "2026-06-17T00:39:04.123868+00:00",
+        "last": "2026-06-17T00:39:04.123868+00:00"
+      },
+      "test": {
+        "rows": 119,
+        "first": "2026-08-16T00:39:04.123868+00:00",
+        "last": "2026-08-16T00:39:04.123868+00:00"
+      }
+    },
+    "feature_reference": {
+      "frequency": {
+        "mean": 12.627551020408163,
+        "std": 11.95073887171902
+      },
+      "previous_frequency": {
+        "mean": 12.197278911564625,
+        "std": 11.229760567156825
+      },
+      "recency": {
+        "mean": 13.558727127425042,
+        "std": 20.153368903477364
+      },
+      "failure_rate": {
+        "mean": 0.06135429124372568,
+        "std": 0.10835260770044179
+      },
+      "amount_mean": {
+        "mean": 11090.370273234617,
+        "std": 8744.195652620656
+      },
+      "merchant_diversity": {
+        "mean": 6.037414965986395,
+        "std": 4.218717291903906
+      },
+      "tenure": {
+        "mean": 105.29591836734694,
+        "std": 42.94631390107989
+      }
+    },
+    "calibration": "Sigmoid on held-out middle period; validation also selects algorithm; final test untouched",
+    "last_refresh": "2026-10-14T20:27:33.183896+00:00",
+    "limitations": [
+      "Synthetic patterns only; no production validity",
+      "Same customer cohorts may appear across temporal snapshots",
+      "SHAP explains raw model margin, not calibrated probability"
+    ],
+    "tracking": "mlflow",
+    "mlflow_run_id": "48ea25ed924e4b4cb622b8659f21a347"
+  },
+  "payment": {
+    "name": "payment",
+    "version": "20261015022737",
+    "algorithm": "lightgbm",
+    "synthetic_only": true,
+    "target": "First terminal attempt outcome is failed or timeout",
+    "features": [
+      "amount_minor",
+      "hour",
+      "channel_ussd",
+      "channel_qr",
+      "customer_prior_failure_rate",
+      "merchant_prior_failure_rate",
+      "customer_prior_attempts"
+    ],
+    "selection_validation": {
+      "xgboost": {
+        "pr_auc": 0.2002557301415664,
+        "roc_auc": 0.6958218232044198,
+        "precision_at_0_5": 0.0,
+        "recall_at_0_5": 0.0,
+        "brier": 0.09245845675468445,
+        "rows": 1628,
+        "positive_rate": 0.11056511056511056
+      },
+      "lightgbm": {
+        "pr_auc": 0.20627768442604844,
+        "roc_auc": 0.7041781767955801,
+        "precision_at_0_5": 0.0,
+        "recall_at_0_5": 0.0,
+        "brier": 0.09241333198428762,
+        "rows": 1628,
+        "positive_rate": 0.11056511056511056
+      }
+    },
+    "test": {
+      "pr_auc": 0.21529572481146142,
+      "roc_auc": 0.6986439375819906,
+      "precision_at_0_5": 0.0,
+      "recall_at_0_5": 0.0,
+      "brier": 0.09840791525527137,
+      "rows": 2819,
+      "positive_rate": 0.11812699538843562
+    },
+    "baseline_test": {
+      "pr_auc": 0.11812699538843562,
+      "roc_auc": 0.5,
+      "precision_at_0_5": 0.0,
+      "recall_at_0_5": 0.0,
+      "brier": 0.10423754740816067,
+      "rows": 2819,
+      "positive_rate": 0.11812699538843562
+    },
+    "splits": {
+      "train": {
+        "rows": 11245,
+        "first": "2025-10-20T00:39:04.123868+00:00",
+        "last": "2026-05-18T00:18:32.123868+00:00"
+      },
+      "calibration": {
+        "rows": 1628,
+        "first": "2026-06-17T00:59:16.123868+00:00",
+        "last": "2026-07-17T00:31:38.123868+00:00"
+      },
+      "test": {
+        "rows": 2819,
+        "first": "2026-08-16T01:35:24.123868+00:00",
+        "last": "2026-10-14T20:18:15.123868+00:00"
+      }
+    },
+    "feature_reference": {
+      "amount_minor": {
+        "mean": 13725.312405513561,
+        "std": 18371.198006509323
+      },
+      "hour": {
+        "mean": 11.61351711871943,
+        "std": 6.874674374733889
+      },
+      "channel_ussd": {
+        "mean": 0.3370386838594931,
+        "std": 0.4727192419337943
+      },
+      "channel_qr": {
+        "mean": 0.32734548688305914,
+        "std": 0.4692653854976703
+      },
+      "customer_prior_failure_rate": {
+        "mean": 0.10860972637583707,
+        "std": 0.1541053679912641
+      },
+      "merchant_prior_failure_rate": {
+        "mean": 0.11152900011493014,
+        "std": 0.05937523824041301
+      },
+      "customer_prior_attempts": {
+        "mean": 6.042507781236105,
+        "std": 3.598485803544955
+      }
+    },
+    "calibration": "Sigmoid on held-out middle period; validation also selects algorithm; final test untouched",
+    "last_refresh": "2026-10-14T20:27:37.222836+00:00",
+    "limitations": [
+      "Synthetic patterns only; no production validity",
+      "Same customer cohorts may appear across temporal snapshots",
+      "SHAP explains raw model margin, not calibrated probability"
+    ],
+    "tracking": "mlflow",
+    "mlflow_run_id": "27077df123754f2eb5408a442d6249eb"
+  }
+}

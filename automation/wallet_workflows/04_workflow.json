@@ -1,0 +1,138 @@
+{
+  "id": "careflowWallet4",
+  "name": "CareFlow Wallet: Merchant experience monitoring",
+  "nodes": [
+    {
+      "id": "schedule",
+      "name": "Schedule",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        0,
+        200
+      ],
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "cronExpression",
+              "expression": "0 * * * *"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "manual",
+      "name": "Manual test",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        200
+      ],
+      "parameters": {}
+    },
+    {
+      "id": "fetch",
+      "name": "Read CareFlow",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        240,
+        200
+      ],
+      "parameters": {
+        "url": "http://careflow:8000/wallet/decisions/refresh",
+        "method": "POST",
+        "options": {
+          "timeout": 120000
+        }
+      }
+    },
+    {
+      "id": "filter",
+      "name": "Select eligible actions",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        480,
+        200
+      ],
+      "parameters": {
+        "jsCode": "const items = $input.all();\nreturn items[0].json.actions.filter(a=>a.entity_type==='merchant' && ['pending','approved','retry'].includes(a.status)).map(a=>({json:a}));"
+      }
+    },
+    {
+      "id": "execute",
+      "name": "Record dry-run execution",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        720,
+        200
+      ],
+      "parameters": {
+        "url": "=http://careflow:8000/wallet/actions/{{ $json.id }}/execute",
+        "method": "POST",
+        "options": {
+          "timeout": 120000
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ { execution_key: \"n8n-\" + $workflow.id + \"-\" + $json.id + \"-\" + $json.attempts } }}"
+      }
+    }
+  ],
+  "connections": {
+    "Schedule": {
+      "main": [
+        [
+          {
+            "node": "Read CareFlow",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Manual test": {
+      "main": [
+        [
+          {
+            "node": "Read CareFlow",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Read CareFlow": {
+      "main": [
+        [
+          {
+            "node": "Select eligible actions",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Select eligible actions": {
+      "main": [
+        [
+          {
+            "node": "Record dry-run execution",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "timezone": "Asia/Dhaka"
+  }
+}

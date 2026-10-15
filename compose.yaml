@@ -1,0 +1,24 @@
+services:
+  careflow:
+    build: .
+    ports: ["127.0.0.1:8000:8000"]
+    environment:
+      REDIS_URL: redis://redis:6379/0
+    volumes:
+      - ./data:/app/data
+      - ./ml/wallet_models:/app/ml/wallet_models
+      - ./mlruns:/app/mlruns
+    depends_on: [redis]
+  redis:
+    image: redis:7.4-alpine
+  n8n:
+    image: n8nio/n8n:2.43.5
+    ports: ["127.0.0.1:5678:5678"]
+    environment:
+      GENERIC_TIMEZONE: Asia/Dhaka
+      TZ: Asia/Dhaka
+    volumes:
+      - careflow_n8n_wallet:/home/node/.n8n
+      - ./automation/wallet_workflows:/workflows:ro
+volumes:
+  careflow_n8n_wallet:

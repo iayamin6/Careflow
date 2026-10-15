@@ -1,0 +1,32 @@
+test_all_six_workflow_exports (test_wallet.EdgeCases.test_all_six_workflow_exports) ... ok
+test_concurrent_duplicate_execution (test_wallet.EdgeCases.test_concurrent_duplicate_execution) ... ok
+test_execution_key_cannot_cross_actions (test_wallet.EdgeCases.test_execution_key_cannot_cross_actions) ... ok
+test_model_forecast_has_review_not_promotion (test_wallet.EdgeCases.test_model_forecast_has_review_not_promotion) ... ok
+test_old_pending_still_blocks_outreach (test_wallet.EdgeCases.test_old_pending_still_blocks_outreach) ... ok
+test_resolution_followup_only_once (test_wallet.EdgeCases.test_resolution_followup_only_once) ... ok
+test_training_features_exclude_future (test_wallet.EdgeCases.test_training_features_exclude_future) ... ok
+test_api_validation_and_views (test_wallet.WalletTest.test_api_validation_and_views) ... ok
+test_approval_consent_and_duplicate_execution (test_wallet.WalletTest.test_approval_consent_and_duplicate_execution) ... ok
+test_contact_limit_across_action_types (test_wallet.WalletTest.test_contact_limit_across_action_types) ... ok
+test_customer_payment_deterioration (test_wallet.WalletTest.test_customer_payment_deterioration) ... ok
+test_decline_without_issues (test_wallet.WalletTest.test_decline_without_issues) ... ok
+test_duplicate_and_conflict (test_wallet.WalletTest.test_duplicate_and_conflict) ... ok
+test_evidence_arriving_during_execution_blocks (test_wallet.WalletTest.test_evidence_arriving_during_execution_blocks) ... ok
+test_failure_backoff_and_limit (test_wallet.WalletTest.test_failure_backoff_and_limit) ... ok
+test_future_and_immutable_fields (test_wallet.WalletTest.test_future_and_immutable_fields) ... ok
+test_late_success_preserves_timeout (test_wallet.WalletTest.test_late_success_preserves_timeout) ... ok
+test_merchant_incident_aggregates (test_wallet.WalletTest.test_merchant_incident_aggregates) ... ok
+test_missing_model_rules_work (test_wallet.WalletTest.test_missing_model_rules_work) ... ok
+test_payment_issue_after_approval_blocks (test_wallet.WalletTest.test_payment_issue_after_approval_blocks) ... ok
+test_receipt_time_prevents_lookahead (test_wallet.WalletTest.test_receipt_time_prevents_lookahead) ... ok
+test_recovery_supersedes (test_wallet.WalletTest.test_recovery_supersedes) ... ok
+test_redis_failure_fallback (test_wallet.WalletTest.test_redis_failure_fallback) ... ok
+test_retries_not_double_counted (test_wallet.WalletTest.test_retries_not_double_counted) ... ok
+test_sparse_merchant (test_wallet.WalletTest.test_sparse_merchant) ... ok
+test_stale_pending_requires_investigation (test_wallet.WalletTest.test_stale_pending_requires_investigation) ... ok
+test_workflow_definitions (test_wallet.WalletTest.test_workflow_definitions) ... ok
+
+----------------------------------------------------------------------
+Ran 27 tests in 0.816s
+
+OK

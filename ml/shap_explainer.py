@@ -12,7 +12,7 @@ import numpy as np
 import pandas as pd
 import shap
 
-from ml.churn_model import load_model, _prep_features, FEATURES, adjust_probability
+from ml.churn_model import load_model, _prep_features, FEATURES
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s")
 logger = logging.getLogger(__name__)
@@ -20,17 +20,21 @@ logger = logging.getLogger(__name__)
 DB_PATH = Path(__file__).parent.parent / "data" / "customers.db"
 
 FEATURE_LABELS = {
-    "login_frequency_weekly":          "login frequency",
-    "onboarding_completion_percentage":"onboarding completion",
-    "features_used_count":             "feature adoption",
-    "support_tickets_raised":          "support tickets",
-    "days_since_login":                "days since last login",
-    "contract_value_usd":              "contract value",
+    "login_frequency_weekly": "login frequency",
+    "onboarding_completion_percentage": "onboarding completion",
+    "features_used_count": "feature adoption",
+    "support_tickets_raised": "support tickets",
+    "days_since_login": "days since last login",
+    "contract_value_usd": "contract value",
 }
 
 
-def _shap_to_text(shap_values: np.ndarray, feature_names: list, row: pd.Series, prob: float) -> str:
-    pairs = sorted(zip(shap_values, feature_names), key=lambda x: abs(x[0]), reverse=True)
+def _shap_to_text(
+    shap_values: np.ndarray, feature_names: list, row: pd.Series, prob: float
+) -> str:
+    pairs = sorted(
+        zip(shap_values, feature_names), key=lambda x: abs(x[0]), reverse=True
+    )
     top = pairs[:3]
 
     reasons = []
@@ -38,18 +42,8 @@ def _shap_to_text(shap_values: np.ndarray, feature_names: list, row: pd.Series, 
         label = FEATURE_LABELS.get(feat, feat)
         actual = row[feat]
 
-        if feat == "login_frequency_weekly":
-            reasons.append(f"login frequency is low ({int(actual)} logins/week)")
-        elif feat == "onboarding_completion_percentage":
-            reasons.append(f"onboarding only {int(actual)}% complete")
-        elif feat == "features_used_count":
-            reasons.append(f"using only {int(actual)} features")
-        elif feat == "support_tickets_raised":
-            reasons.append(f"{int(actual)} support tickets raised")
-        elif feat == "days_since_login":
-            reasons.append(f"no activity in {int(actual)} days")
-        elif feat == "contract_value_usd":
-            reasons.append(f"contract value ${int(actual):,}")
+        direction = "increases" if val > 0 else "decreases"
+        reasons.append(f"{label} = {actual:g} ({direction} model risk)")
 
     risk_pct = int(prob * 100)
     return f"{risk_pct}% churn risk. Key drivers: " + ", ".join(reasons) + "."
@@ -86,7 +80,7 @@ def explain_all() -> dict:
     explanations = {}
     for i, row in df.iterrows():
         sv = shap_values_array[i]
-        adjusted_p = adjust_probability(probs[i], row)
+        adjusted_p = float(probs[i])
         text = _shap_to_text(sv, FEATURES, row, adjusted_p)
         explanations[row["customer_id"]] = text
 
