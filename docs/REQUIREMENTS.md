@@ -23,7 +23,7 @@ The master prompt describes an independent portfolio simulation. â€œImplementedâ
 | Redis | Live 30-second summary cache tested; SQLite fallback; cache partitioned by DB path; never used for action eligibility |
 | Security/privacy | Synthetic data, hashed/expiring/revocable tokens, five roles, per-process request throttle, input validation, secret exclusion, protected legacy endpoints |
 | Dashboard | Executive, reliability, customer, merchant, decision, model, automation, incident, servicing, preference, complaint, Spark, experiment, governance and outbox views |
-| Reproducibility | Seeded seasonal/friction generator, separate DB/model paths, scripts, model reports, 53 regression tests, Spark comparisons and setup documentation |
+| Reproducibility | Seeded seasonal/friction generator, separate DB/model paths, scripts, model reports, 57 regression tests, Spark comparisons and setup documentation |
 
 ## Explicit boundaries
 

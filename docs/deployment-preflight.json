@@ -1,0 +1,22 @@
+{
+  "mode": "docker",
+  "ready": false,
+  "checks": [
+    {
+      "check": "disk_space",
+      "status": "fail",
+      "message": "1.4 GiB free; allow at least 8 GiB headroom for the Python/Java/Spark image build"
+    },
+    {
+      "check": "compose_config",
+      "status": "pass",
+      "message": "Command responded successfully"
+    },
+    {
+      "check": "docker_engine",
+      "status": "fail",
+      "message": "Unavailable or did not respond within 15 seconds"
+    }
+  ],
+  "scope": "Readiness only; does not build containers, verify external delivery, or certify production readiness"
+}

@@ -2,7 +2,7 @@
 
 ## Completed
 
-- **53 isolated regression tests pass.** Coverage includes the original acceptance scenarios and payment conflicts, late confirmations/receipts, future-feature exclusion, role boundaries and credential revocation, evidence races, preference/complaint/holdout suppression, incident resolution, partial/full refunds, uncertain sends, monthly cadence, absolute merchant impact and model promotion.
+- **57 isolated regression tests pass.** Coverage includes the original acceptance scenarios and payment conflicts, late confirmations/receipts, future-feature exclusion, role boundaries and credential revocation, evidence races, preference/complaint/holdout suppression, incident resolution, partial/full refunds, uncertain sends, monthly cadence, absolute merchant impact and model promotion.
 - **Scala 2.13 / Apache Spark 4.0.3 compiled and ran.** A native local[2] run processed 1,006,150 replicated immutable events into 963,200 attempts and 939,000 transactions. Benchmark results remain separate from normal metrics. This is not a remote-cluster or production-throughput claim. See [scale manifest](spark-scale-verification.json).
 - The normal v2 dataset contains 120 customers, 12 merchants, 16,282 logical transactions and 17,423 events. Salary-cycle, monthly-user, weekend, merchant-size, outage and post-failure engagement patterns are generated with seed 42. The original v1 and legacy customer databases remain separate.
 - **555 cross-engine assertions pass** on customer/merchant frequency, value, active days and 1/7/30-day reliability. Spark approximate p95 is excluded from exact equality. A second normal batch was launched through the signed-in dashboard and visibly completed. See [Spark verification](spark-verification.json).
@@ -29,3 +29,5 @@ Python 3.14 on macOS arm64; Java 17; Spark 4.0.3; Scala 2.13.16. Native API, SQL
 Docker Compose startup remains unverified because the Docker engine was stopped. A remote Spark cluster was not available; the batch output/export paths require shared-storage configuration there. API background batch/retraining tasks are not a durable distributed job queue.
 
 SMTP/HTTPS adapter behavior was mock-tested, including provider acceptance versus delivered receipts and ambiguous failure handling. No real provider messages were sent. Live SMTP/webhook, legacy Slack, Google Sheets and Groq access require real credentials and verified recipients and remain unverified. Synthetic experiments cannot establish real retention uplift. Refund/settlement servicing records do not execute money movement.
+
+Deployment follow-up: Compose syntax validates, and named volumes now isolate container tracking paths from native MLflow paths. Health checks gate startup. The read-only preflight reports are in `deployment-preflight.json` and `native-preflight.json`; container build/start remains blocked by an unresponsive engine and low disk space. Four additional regression tests cover preflight behavior.

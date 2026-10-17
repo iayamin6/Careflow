@@ -12,3 +12,7 @@ spark/target
 *.token
 data/wallet*.db
 data/mlflow.db
+ml/wallet_models
+mlartifacts
+data/*.db-shm
+data/*.db-wal

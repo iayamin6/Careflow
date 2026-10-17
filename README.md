@@ -82,6 +82,6 @@ Live delivery additionally requires an admin-verified destination, consent, pref
 
 ## Containers
 
-`docker compose up --build` defines the API (including Java/Spark), Redis and n8n on loopback ports. Bootstrap data/models/token with `docker compose exec careflow` and the same Python commands above; import the workflows and configure the restricted credential. Native services were tested. Container startup remains unverified because Docker's engine was stopped in this environment.
+Run `python scripts/preflight.py --mode docker` first. See the [deployment guide](docs/DEPLOYMENT.md) for bootstrap, storage and readiness checks. `docker compose up --build` defines the API (including Java/Spark), Redis and n8n on loopback ports. Bootstrap data/models/token with `docker compose exec careflow` and the same Python commands above; import the workflows and configure the restricted credential. Container data, models, credentials and MLflow artifacts use named volumes, separate from native paths. Native services were tested. Compose configuration validates; container startup remains unverified because Docker did not respond and only 1.4 GiB was free.
 
 ![Spark engagement analytics](docs/screenshots/spark-analytics.png)

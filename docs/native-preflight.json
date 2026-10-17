@@ -1,0 +1,42 @@
+{
+  "mode": "native",
+  "ready": true,
+  "checks": [
+    {
+      "check": "disk_space",
+      "status": "warn",
+      "message": "1.4 GiB free; allow at least 8 GiB headroom for the Python/Java/Spark image build"
+    },
+    {
+      "check": "wallet_database",
+      "status": "pass",
+      "message": "Read-only schema/integrity check complete"
+    },
+    {
+      "check": "model_artifacts",
+      "status": "pass",
+      "message": "Both artifact sets are present (not deserialized)"
+    },
+    {
+      "check": "tracking_artifacts",
+      "status": "pass",
+      "message": "Recorded absolute local artifact locations are accessible; remote URIs not checked"
+    },
+    {
+      "check": "spark_runtime",
+      "status": "pass",
+      "message": "Spark requires SPARK_HOME, spark-submit and the built Scala jar"
+    },
+    {
+      "check": "java",
+      "status": "pass",
+      "message": "Command responded successfully"
+    },
+    {
+      "check": "api_health",
+      "status": "pass",
+      "message": "Health endpoint responded"
+    }
+  ],
+  "scope": "Readiness only; does not build containers, verify external delivery, or certify production readiness"
+}
