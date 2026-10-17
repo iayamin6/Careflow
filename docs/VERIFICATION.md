@@ -26,8 +26,12 @@ Both models have zero recall at 0.5 on this test set. The review thresholds were
 
 Python 3.14 on macOS arm64; Java 17; Spark 4.0.3; Scala 2.13.16. Native API, SQLite, Redis, MLflow, n8n and Spark were exercised. Direct Python versions are recorded in `requirements-wallet-tested.txt`; transitive dependencies are not fully locked.
 
-Docker Compose startup remains unverified because the Docker engine was stopped. A remote Spark cluster was not available; the batch output/export paths require shared-storage configuration there. API background batch/retraining tasks are not a durable distributed job queue.
+Docker Compose build/startup subsequently passed on 18 October; see the addendum below. A remote Spark cluster was not available; the batch output/export paths require shared-storage configuration there. API background batch/retraining tasks are not a durable distributed job queue.
 
 SMTP/HTTPS adapter behavior was mock-tested, including provider acceptance versus delivered receipts and ambiguous failure handling. No real provider messages were sent. Live SMTP/webhook, legacy Slack, Google Sheets and Groq access require real credentials and verified recipients and remain unverified. Synthetic experiments cannot establish real retention uplift. Refund/settlement servicing records do not execute money movement.
 
 Deployment follow-up: Compose syntax validates, and named volumes now isolate container tracking paths from native MLflow paths. Health checks gate startup. The read-only preflight reports are in `deployment-preflight.json` and `native-preflight.json`; container build/start remains blocked by an unresponsive engine and low disk space. Four additional regression tests cover preflight behavior.
+
+## Docker verification — 18 October 2026
+
+After the engine recovered and disk space was available, the image built and API/Redis became healthy; n8n started and its health endpoint returned 200. All 57 tests passed inside Python 3.12/Linux arm64. Both models trained with MLflow. API smoke checks and a Scala/Spark run over 17,441 events passed, including 555 independent metric comparisons. CareFlow is served on localhost:18000 and n8n on localhost:15678 to avoid port conflicts. This supersedes the earlier container-launch blocker. Native and container datasets remain separate. See `docker-verification.json`.

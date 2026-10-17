@@ -28,7 +28,7 @@ The master prompt describes an independent portfolio simulation. â€œImplementedâ
 ## Explicit boundaries
 
 - **External provider setup remains:** SMTP/HTTPS adapter code exists and is mock-tested. Actual email/webhook delivery, legacy Slack/Google Sheets/Groq access and provider receipt verification need real credentials and verified recipients. No real messages were sent.
-- **Deployment verification remains:** native API, Redis, MLflow, n8n and local Spark were exercised. Docker Compose startup and a remote Spark cluster were not tested. Docker's engine was stopped. API background jobs need durable supervision for a deployed service.
+- **Deployment verification remains:** native API, Redis, MLflow, n8n and local Spark were exercised. Docker build/startup, service health, container tests, model training and Spark/API checks subsequently passed. A remote Spark cluster remains unverified. API background jobs need durable supervision for a deployed service.
 - **Value analysis is a scenario:** annualized volume at an assumed margin is implemented. A trained lifetime-value model was not part of the defined core target and is not claimed.
 - **No real financial execution:** settlement/refund entries record confirmed outcomes; there is no real wallet money-movement, fraud scoring, credit decision, compensation issuance or transaction-blocking adapter.
 - **No production validity claim:** synthetic temporal metrics, heuristic NLP/calendar baselines, experimental policy thresholds and simulated experiments require real-world evaluation before operational use.

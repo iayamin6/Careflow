@@ -1,7 +1,7 @@
 services:
   careflow:
     build: .
-    ports: ["127.0.0.1:8000:8000"]
+    ports: ["127.0.0.1:${CAREFLOW_API_PORT:-8000}:8000"]
     environment:
       REDIS_URL: redis://redis:6379/0
       MLFLOW_TRACKING_URI: sqlite:////app/data/mlflow.db
@@ -29,7 +29,7 @@ services:
       retries: 3
   n8n:
     image: n8nio/n8n:2.43.5
-    ports: ["127.0.0.1:5678:5678"]
+    ports: ["127.0.0.1:${CAREFLOW_N8N_PORT:-5678}:5678"]
     environment:
       GENERIC_TIMEZONE: Asia/Dhaka
       TZ: Asia/Dhaka
