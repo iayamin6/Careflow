@@ -8,7 +8,11 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from fastapi.testclient import TestClient
 from api.main import app
 
-client = TestClient(app)
+from wallet.security import issue
+
+client = TestClient(
+    app, headers={"Authorization": "Bearer " + issue("smoke-test", "analyst", 1)}
+)
 results = {}
 for path in [
     "/",
@@ -22,6 +26,14 @@ for path in [
     "/wallet/models",
     "/wallet/report",
     "/wallet/outcomes",
+    "/wallet/incidents",
+    "/wallet/servicing",
+    "/wallet/complaints",
+    "/wallet/batch",
+    "/wallet/deliveries",
+    "/wallet/experiments",
+    "/wallet/models/candidates",
+    "/wallet/models/monitoring",
 ]:
     response = client.get(path)
     assert response.status_code == 200, (path, response.text)

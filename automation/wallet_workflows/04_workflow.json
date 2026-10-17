@@ -47,6 +47,14 @@
         "method": "POST",
         "options": {
           "timeout": 120000
+        },
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth"
+      },
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "careflow-api",
+          "name": "CareFlow Automation"
         }
       }
     },
@@ -80,7 +88,15 @@
         },
         "sendBody": true,
         "specifyBody": "json",
-        "jsonBody": "={{ { execution_key: \"n8n-\" + $workflow.id + \"-\" + $json.id + \"-\" + $json.attempts } }}"
+        "jsonBody": "={{ { execution_key: \"n8n-\" + $workflow.id + \"-\" + $json.id + \"-\" + $json.attempts } }}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth"
+      },
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "careflow-api",
+          "name": "CareFlow Automation"
+        }
       }
     }
   ],

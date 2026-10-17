@@ -47,6 +47,14 @@
         "method": "GET",
         "options": {
           "timeout": 120000
+        },
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth"
+      },
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "careflow-api",
+          "name": "CareFlow Automation"
         }
       }
     },
@@ -80,7 +88,40 @@
         },
         "sendBody": true,
         "specifyBody": "json",
-        "jsonBody": "={{ { execution_key: \"n8n-\" + $workflow.id + \"-\" + $json.id + \"-\" + $json.attempts } }}"
+        "jsonBody": "={{ { execution_key: \"n8n-\" + $workflow.id + \"-\" + $json.id + \"-\" + $json.attempts } }}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth"
+      },
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "careflow-api",
+          "name": "CareFlow Automation"
+        }
+      }
+    },
+    {
+      "id": "dispatch",
+      "name": "Process delivery outbox",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        960,
+        200
+      ],
+      "parameters": {
+        "url": "http://careflow:8000/wallet/deliveries/dispatch",
+        "method": "POST",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "options": {
+          "timeout": 120000
+        }
+      },
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "careflow-api",
+          "name": "CareFlow Automation"
+        }
       }
     }
   ],
@@ -123,6 +164,17 @@
         [
           {
             "node": "Record dry-run execution",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Record dry-run execution": {
+      "main": [
+        [
+          {
+            "node": "Process delivery outbox",
             "type": "main",
             "index": 0
           }

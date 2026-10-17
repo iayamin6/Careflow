@@ -251,7 +251,11 @@ class WalletTest(unittest.TestCase):
     def test_api_validation_and_views(self):
         from api.main import app
 
-        client = TestClient(app)
+        from wallet.security import issue
+
+        client = TestClient(
+            app, headers={"Authorization": "Bearer " + issue("test-admin", "admin")}
+        )
         for path in [
             "/wallet",
             "/wallet/analytics",
@@ -361,11 +365,31 @@ class EdgeCases(unittest.TestCase):
                 transaction_id=e["transaction_id"],
                 attempt_id=e["attempt_id"],
             )
+        from wallet import operations
+
+        self.assertFalse(
+            any(
+                x["kind"] == "resolution_follow_up"
+                for x in decisions.refresh()["actions"]
+            )
+        )
+        incident = operations.incidents()[0]
+        operations.update_incident(
+            incident["id"], "resolved", "operator", "Success confirmations received"
+        )
         first = decisions.refresh()["actions"]
         self.assertEqual(sum(a["kind"] == "resolution_follow_up" for a in first), 1)
         self.event("succeeded")
         second = decisions.refresh()["actions"]
         self.assertEqual(sum(a["kind"] == "resolution_follow_up" for a in second), 1)
+        followup = next(a for a in second if a["kind"] == "resolution_follow_up")
+        self.assertEqual(followup["status"], "pending")
+        decisions.approve(followup["id"])
+        operations.update_incident(
+            incident["id"], "investigating", "operator", "Reopened for review"
+        )
+        with self.assertRaisesRegex(ValueError, "resolution"):
+            decisions.execute(followup["id"], "reviewed-followup")
 
     def test_execution_key_cannot_cross_actions(self):
         self.customer("C2")

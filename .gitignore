@@ -8,3 +8,8 @@ mlruns/
 *.pyc
 data/mlflow.db
 mlartifacts/
+data/batch/
+spark/target/
+.local/
+*.token
+ml/wallet_models_v2/

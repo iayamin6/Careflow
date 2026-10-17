@@ -70,9 +70,15 @@ def migrate():
           detail TEXT NOT NULL, created_at TEXT NOT NULL);
         """)
         c.execute("INSERT OR IGNORE INTO schema_versions VALUES(1,?)", (utc(),))
+        from .migrations import upgrade
+
+        upgrade(c, utc())
 
 
 def audit(c, kind, entity_id, detail):
+    from .security import actor
+
+    detail = {**detail, "actor": actor.get()}
     c.execute(
         "INSERT INTO audit(kind,entity_id,detail,created_at) VALUES(?,?,?,?)",
         (kind, str(entity_id), json.dumps(detail, sort_keys=True), utc()),
@@ -127,6 +133,15 @@ def ingest(data):
             raise ValueError("Payment cannot precede onboarding")
         if data["occurred_at"] > data["received_at"]:
             raise ValueError("Future payment events are not accepted")
+        if data["status"] in ("refunded", "reversed"):
+            succeeded = c.execute(
+                "SELECT 1 FROM payment_events WHERE transaction_id=? AND status='succeeded' AND occurred_at<=?",
+                (data["transaction_id"], data["occurred_at"]),
+            ).fetchone()
+            if not succeeded:
+                raise ValueError(
+                    "Refund/reversal requires an earlier successful original payment"
+                )
         identity = (
             data["customer_id"],
             data["merchant_id"],

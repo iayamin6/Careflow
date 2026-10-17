@@ -385,3 +385,9 @@ def score_history():
             for r in reversed(rows)
         ]
     }
+
+from wallet.security import install as install_security
+install_security(app)
+
+from wallet.extensions_api import router as operations_router
+app.include_router(operations_router)

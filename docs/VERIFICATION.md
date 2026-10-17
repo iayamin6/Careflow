@@ -1,28 +1,31 @@
-# Verification record — 15 October 2026
+# Verification record — 17 October 2026
 
 ## Completed
 
-- 27 isolated regression tests pass. The cases cover all eight requested acceptance scenarios at the service/API level, plus event conflicts, attempt identity, consent/approval, contact safeguards, concurrent duplicate execution, incoming-evidence races, stale pending payments, leakage prevention and six workflow graph definitions.
-- Python modules compile and Ruff's undefined/unused-name checks pass for wallet services and tests. Browser JavaScript syntax checks pass.
-- Original API endpoints remain accessible. The original Streamlit dashboard runs through Streamlit AppTest without exceptions (upstream deprecation warnings remain).
-- Synthetic dataset generated: 120 customers, 12 merchants, 18,780 logical transactions and 20,123 immutable events, seed 42, cutoff `2026-10-14T20:24:22.123868+00:00`.
-- Both model training pipelines ran. XGBoost was selected for churn; LightGBM for payment failure. Both MLflow runs are FINISHED in the local SQLite tracking store.
-- Browser verification confirms the reliability view, model-monitoring table and pre-attempt prediction with signed SHAP contributions render. Browser approval and dry-run execution succeeded and the action changed to completed. Screenshots are included.
-- Read-only API smoke checks cover original and wallet routes and a payment prediction with SHAP explanations. See `scripts/verify_demo.py`.
+- **53 isolated regression tests pass.** Coverage includes the original acceptance scenarios and payment conflicts, late confirmations/receipts, future-feature exclusion, role boundaries and credential revocation, evidence races, preference/complaint/holdout suppression, incident resolution, partial/full refunds, uncertain sends, monthly cadence, absolute merchant impact and model promotion.
+- **Scala 2.13 / Apache Spark 4.0.3 compiled and ran.** A native local[2] run processed 1,006,150 replicated immutable events into 963,200 attempts and 939,000 transactions. Benchmark results remain separate from normal metrics. This is not a remote-cluster or production-throughput claim. See [scale manifest](spark-scale-verification.json).
+- The normal v2 dataset contains 120 customers, 12 merchants, 16,282 logical transactions and 17,423 events. Salary-cycle, monthly-user, weekend, merchant-size, outage and post-failure engagement patterns are generated with seed 42. The original v1 and legacy customer databases remain separate.
+- **555 cross-engine assertions pass** on customer/merchant frequency, value, active days and 1/7/30-day reliability. Spark approximate p95 is excluded from exact equality. A second normal batch was launched through the signed-in dashboard and visibly completed. See [Spark verification](spark-verification.json).
+- **All six n8n exports imported and executed successfully** with n8n 2.43.5 / Node 24 and a restricted automation credential. The approved-retention workflow executed action 15 and processed the outbox to simulated. Other runs correctly returned no new work where incidents/actions were already handled. Schedules remain inactive. See [node-level results](n8n-verification.json).
+- **Live Redis 7.4.9** cache miss/write/hit/30-second TTL verified, including database-specific keys. SQLite fallback is covered by regression tests. See [Redis verification](redis-verification.json).
+- Both model pipelines trained and wrote FINISHED MLflow runs. A separate retraining candidate completed, passed both baseline gates, was promoted through the atomic pointer, and both models loaded successfully. See [governance verification](governance-verification.json).
+- Authenticated API smoke checks passed for original and wallet routes, operations, Spark, monitoring and SHAP prediction. See [API verification](api-verification.json).
+- Browser verification covered operator login, executive reporting, incident owner/note update, Spark engagement tables and successful dashboard batch submission. No browser errors/warnings were recorded. Screenshots are included.
+- Python compilation, Ruff undefined/unused-name checks and browser JavaScript syntax checks passed. The preserved Streamlit dashboard was previously checked using AppTest without exceptions; upstream deprecation warnings remain.
 
-## Measured model results (synthetic only)
+## Measured model results — synthetic data only
 
-| Model | Final test rows | PR-AUC | Prevalence baseline PR-AUC | Brier |
-|---|---:|---:|---:|---:|
-| Churn / XGBoost | 119 | 0.493 | 0.210 | 0.136 |
-| Payment failure / LightGBM | 2,819 | 0.215 | 0.118 | 0.098 |
+| Model | Selected algorithm | Test rows | PR-AUC | Prevalence baseline | Brier | Precision / recall at calibration-selected review threshold |
+|---|---|---:|---:|---:|---:|---|
+| 30-day inactivity | XGBoost | 119 | 0.376 | 0.202 | 0.150 | 0.318 / 0.875 |
+| First terminal payment failure | XGBoost | 2,570 | 0.210 | 0.113 | 0.095 | 0.198 / 0.710 |
 
-Precision/recall at 0.5 is weak: churn recall 0.04, payment recall 0.0. These are honest demonstration results, not deployment recommendations. See `model-evaluation.json` for full metrics, candidate comparisons and exact time splits.
+Both models have zero recall at 0.5 on this test set. The review thresholds were selected on calibration data, separately from candidate selection and final test. These weak-to-moderate synthetic results are not a deployment recommendation. Business action thresholds remain explicit experimental rules. See [complete evaluation](model-evaluation.json) for dates, candidates, features, calibration and limitations.
 
-## Environment and remaining deployment checks
+## Environment and external boundaries
 
-Python 3.14 on macOS arm64. Direct dependency versions are in `requirements-wallet-tested.txt`; transitive dependencies are not fully locked. Local SQLite and MLflow were exercised. Redis fallback was tested; the Redis server path and Docker Compose deployment have not yet been exercised. The Docker daemon is not running on this machine.
+Python 3.14 on macOS arm64; Java 17; Spark 4.0.3; Scala 2.13.16. Native API, SQLite, Redis, MLflow, n8n and Spark were exercised. Direct Python versions are recorded in `requirements-wallet-tested.txt`; transitive dependencies are not fully locked.
 
-Live provider delivery is deliberately not implemented for fictional customers. The durable dry-run transport is tested; it cannot prove real email/Slack delivery or causal retention uplift. Original optional Groq, Google Sheets, SMTP and Slack integrations are preserved but were not invoked.
+Docker Compose startup remains unverified because the Docker engine was stopped. A remote Spark cluster was not available; the batch output/export paths require shared-storage configuration there. API background batch/retraining tasks are not a durable distributed job queue.
 
-All six inactive exports imported and executed successfully using n8n 2.43.5 with Node.js 24.19.0. Native test copies used localhost port 8010. The merchant workflow recorded twelve dry-run executions; the approved-retention workflow was rerun with an approved action and recorded one execution. Workflows 2 and 3 correctly returned no individual actions while merchant incidents owned the alerts. See `n8n-verification.json` for node-level results. Schedules remain inactive. The Python task runner was unavailable, but these workflows use JavaScript and its runner registered successfully.
+SMTP/HTTPS adapter behavior was mock-tested, including provider acceptance versus delivered receipts and ambiguous failure handling. No real provider messages were sent. Live SMTP/webhook, legacy Slack, Google Sheets and Groq access require real credentials and verified recipients and remain unverified. Synthetic experiments cannot establish real retention uplift. Refund/settlement servicing records do not execute money movement.

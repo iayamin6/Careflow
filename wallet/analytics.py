@@ -148,7 +148,10 @@ def entity_metrics(a, t, entity, key, at):
         else 1
     )
     deteriorating = bool(
-        sufficient and drop is not None and drop > max(0.15, 2 * standard_error)
+        sufficient
+        and drop is not None
+        and drop > 2 * standard_error
+        and (drop > 0.15 or (drop >= 0.02 and n * drop >= 20))
     )
     unresolved = window(tt, at, 7)
     unresolved = (
@@ -225,6 +228,9 @@ def entity_metrics(a, t, entity, key, at):
         "reliability_7d": current,
         "baseline_30d": baseline,
         "success_rate_drop": drop,
+        "estimated_excess_failed_attempts": round(n * max(drop, 0), 1)
+        if drop is not None
+        else None,
         "behavior": b,
     }
     if key == "merchant_id":
@@ -287,7 +293,7 @@ def snapshot(as_of=None):
         if len(a)
         else {}
     )
-    return {
+    result = {
         "as_of": at,
         "synthetic": True,
         "evidence_notice": "Correlated patterns require investigation; they do not establish technical root cause.",
@@ -308,3 +314,7 @@ def snapshot(as_of=None):
             for i in range(13, -1, -1)
         ],
     }
+
+    from .experience import enrich
+
+    return enrich(result)

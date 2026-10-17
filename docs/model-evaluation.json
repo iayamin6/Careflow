@@ -1,7 +1,7 @@
 {
   "churn": {
     "name": "churn",
-    "version": "20261015022733",
+    "version": "20261016224826",
     "algorithm": "xgboost",
     "synthetic_only": true,
     "target": "No successful transaction in the next 30 days",
@@ -16,103 +16,114 @@
     ],
     "selection_validation": {
       "xgboost": {
-        "pr_auc": 0.39217420268864245,
-        "roc_auc": 0.7334692028985507,
-        "precision_at_0_5": 1.0,
-        "recall_at_0_5": 0.043478260869565216,
-        "brier": 0.1476908028125763,
+        "pr_auc": 0.21216095192712853,
+        "roc_auc": 0.5938552188552189,
+        "precision_at_0_5": 0.5,
+        "recall_at_0_5": 0.09090909090909091,
+        "brier": 0.10213728249073029,
         "rows": 119,
-        "positive_rate": 0.19327731092436976
+        "positive_rate": 0.09243697478991597
       },
       "lightgbm": {
-        "pr_auc": 0.3707577858908957,
-        "roc_auc": 0.7182971014492754,
-        "precision_at_0_5": 1.0,
-        "recall_at_0_5": 0.043478260869565216,
-        "brier": 0.15984696697601591,
+        "pr_auc": 0.18095300212431917,
+        "roc_auc": 0.6212121212121212,
+        "precision_at_0_5": 0.3,
+        "recall_at_0_5": 0.2727272727272727,
+        "brier": 0.10698427443811175,
         "rows": 119,
-        "positive_rate": 0.19327731092436976
+        "positive_rate": 0.09243697478991597
       }
     },
     "test": {
-      "pr_auc": 0.492793591475893,
-      "roc_auc": 0.8187234042553192,
-      "precision_at_0_5": 0.5,
-      "recall_at_0_5": 0.04,
-      "brier": 0.13630889707818175,
+      "pr_auc": 0.37618929505064047,
+      "roc_auc": 0.743859649122807,
+      "precision_at_0_5": 0.0,
+      "recall_at_0_5": 0.0,
+      "brier": 0.1501070942997207,
       "rows": 119,
-      "positive_rate": 0.21008403361344538
+      "positive_rate": 0.20168067226890757
     },
+    "review_threshold": 0.15015130199349963,
+    "test_at_review_threshold": {
+      "precision": 0.3181818181818182,
+      "recall": 0.875
+    },
+    "threshold_method": "Maximum F1 on calibration data; internal review policy only, not permission to contact customers",
     "baseline_test": {
-      "pr_auc": 0.21008403361344538,
+      "pr_auc": 0.20168067226890757,
       "roc_auc": 0.5,
       "precision_at_0_5": 0.0,
       "recall_at_0_5": 0.0,
-      "brier": 0.16705185475550757,
+      "brier": 0.16452368248447688,
       "rows": 119,
-      "positive_rate": 0.21008403361344538
+      "positive_rate": 0.20168067226890757
     },
     "splits": {
       "train": {
-        "rows": 588,
-        "first": "2025-12-19T00:39:04.123868+00:00",
-        "last": "2026-04-18T00:39:04.123868+00:00"
+        "rows": 583,
+        "first": "2025-12-22T08:01:24.492450+00:00",
+        "last": "2026-04-21T08:01:24.492450+00:00"
+      },
+      "selection": {
+        "rows": 119,
+        "first": "2026-05-21T08:01:24.492450+00:00",
+        "last": "2026-05-21T08:01:24.492450+00:00"
       },
       "calibration": {
         "rows": 119,
-        "first": "2026-06-17T00:39:04.123868+00:00",
-        "last": "2026-06-17T00:39:04.123868+00:00"
+        "first": "2026-06-20T08:01:24.492450+00:00",
+        "last": "2026-06-20T08:01:24.492450+00:00"
       },
       "test": {
         "rows": 119,
-        "first": "2026-08-16T00:39:04.123868+00:00",
-        "last": "2026-08-16T00:39:04.123868+00:00"
+        "first": "2026-08-19T08:01:24.492450+00:00",
+        "last": "2026-08-19T08:01:24.492450+00:00"
       }
     },
     "feature_reference": {
       "frequency": {
-        "mean": 12.627551020408163,
-        "std": 11.95073887171902
+        "mean": 10.728987993138936,
+        "std": 8.691266314091823
       },
       "previous_frequency": {
-        "mean": 12.197278911564625,
-        "std": 11.229760567156825
+        "mean": 10.718696397941681,
+        "std": 8.494375156199856
       },
       "recency": {
-        "mean": 13.558727127425042,
-        "std": 20.153368903477364
+        "mean": 12.576233998792961,
+        "std": 18.047832865231566
       },
       "failure_rate": {
-        "mean": 0.06135429124372568,
-        "std": 0.10835260770044179
+        "mean": 0.07354521194028142,
+        "std": 0.12118684219292387
       },
       "amount_mean": {
-        "mean": 11090.370273234617,
-        "std": 8744.195652620656
+        "mean": 11741.341909709503,
+        "std": 9120.251467720349
       },
       "merchant_diversity": {
-        "mean": 6.037414965986395,
-        "std": 4.218717291903906
+        "mean": 5.367066895368782,
+        "std": 3.3242438833306083
       },
       "tenure": {
-        "mean": 105.29591836734694,
-        "std": 42.94631390107989
+        "mean": 106.22641509433963,
+        "std": 42.65408923579666
       }
     },
-    "calibration": "Sigmoid on held-out middle period; validation also selects algorithm; final test untouched",
-    "last_refresh": "2026-10-14T20:27:33.183896+00:00",
+    "calibration": "Separate chronological selection and calibration periods; final test untouched",
+    "last_refresh": "2026-10-16T16:48:26.088030+00:00",
     "limitations": [
       "Synthetic patterns only; no production validity",
       "Same customer cohorts may appear across temporal snapshots",
       "SHAP explains raw model margin, not calibrated probability"
     ],
     "tracking": "mlflow",
-    "mlflow_run_id": "48ea25ed924e4b4cb622b8659f21a347"
+    "mlflow_run_id": "7ca4649bbd784165a3f0c2da65e74c72"
   },
   "payment": {
     "name": "payment",
-    "version": "20261015022737",
-    "algorithm": "lightgbm",
+    "version": "20261016224827",
+    "algorithm": "xgboost",
     "synthetic_only": true,
     "target": "First terminal attempt outcome is failed or timeout",
     "features": [
@@ -126,97 +137,108 @@
     ],
     "selection_validation": {
       "xgboost": {
-        "pr_auc": 0.2002557301415664,
-        "roc_auc": 0.6958218232044198,
+        "pr_auc": 0.20345089601586017,
+        "roc_auc": 0.6865364850976362,
         "precision_at_0_5": 0.0,
         "recall_at_0_5": 0.0,
-        "brier": 0.09245845675468445,
-        "rows": 1628,
-        "positive_rate": 0.11056511056511056
+        "brier": 0.09059838205575943,
+        "rows": 1558,
+        "positive_rate": 0.10783055198973042
       },
       "lightgbm": {
-        "pr_auc": 0.20627768442604844,
-        "roc_auc": 0.7041781767955801,
+        "pr_auc": 0.19477434448235634,
+        "roc_auc": 0.6948526892771497,
         "precision_at_0_5": 0.0,
         "recall_at_0_5": 0.0,
-        "brier": 0.09241333198428762,
-        "rows": 1628,
-        "positive_rate": 0.11056511056511056
+        "brier": 0.09121946090435812,
+        "rows": 1558,
+        "positive_rate": 0.10783055198973042
       }
     },
     "test": {
-      "pr_auc": 0.21529572481146142,
-      "roc_auc": 0.6986439375819906,
+      "pr_auc": 0.2098570255926117,
+      "roc_auc": 0.6796801270417422,
       "precision_at_0_5": 0.0,
       "recall_at_0_5": 0.0,
-      "brier": 0.09840791525527137,
-      "rows": 2819,
-      "positive_rate": 0.11812699538843562
+      "brier": 0.09502543438257668,
+      "rows": 2570,
+      "positive_rate": 0.11284046692607004
     },
+    "review_threshold": 0.08833636386263836,
+    "test_at_review_threshold": {
+      "precision": 0.19807692307692307,
+      "recall": 0.7103448275862069
+    },
+    "threshold_method": "Maximum F1 on calibration data; internal review policy only, not permission to contact customers",
     "baseline_test": {
-      "pr_auc": 0.11812699538843562,
+      "pr_auc": 0.11284046692607004,
       "roc_auc": 0.5,
       "precision_at_0_5": 0.0,
       "recall_at_0_5": 0.0,
-      "brier": 0.10423754740816067,
-      "rows": 2819,
-      "positive_rate": 0.11812699538843562
+      "brier": 0.10011150983888717,
+      "rows": 2570,
+      "positive_rate": 0.11284046692607004
     },
     "splits": {
       "train": {
-        "rows": 11245,
-        "first": "2025-10-20T00:39:04.123868+00:00",
-        "last": "2026-05-18T00:18:32.123868+00:00"
+        "rows": 8394,
+        "first": "2025-10-23T08:01:24.492450+00:00",
+        "last": "2026-04-21T06:33:09.492450+00:00"
+      },
+      "selection": {
+        "rows": 1558,
+        "first": "2026-05-21T08:38:31.492450+00:00",
+        "last": "2026-06-20T07:46:36.492450+00:00"
       },
       "calibration": {
-        "rows": 1628,
-        "first": "2026-06-17T00:59:16.123868+00:00",
-        "last": "2026-07-17T00:31:38.123868+00:00"
+        "rows": 1358,
+        "first": "2026-06-20T09:49:17.492450+00:00",
+        "last": "2026-07-20T06:04:22.492450+00:00"
       },
       "test": {
-        "rows": 2819,
-        "first": "2026-08-16T01:35:24.123868+00:00",
-        "last": "2026-10-14T20:18:15.123868+00:00"
+        "rows": 2570,
+        "first": "2026-08-19T08:21:02.492450+00:00",
+        "last": "2026-10-16T15:54:50.492450+00:00"
       }
     },
     "feature_reference": {
       "amount_minor": {
-        "mean": 13725.312405513561,
-        "std": 18371.198006509323
+        "mean": 13566.032761496306,
+        "std": 18690.80565664207
       },
       "hour": {
-        "mean": 11.61351711871943,
-        "std": 6.874674374733889
+        "mean": 11.581605908982606,
+        "std": 6.917933945489123
       },
       "channel_ussd": {
-        "mean": 0.3370386838594931,
-        "std": 0.4727192419337943
+        "mean": 0.3388134381701215,
+        "std": 0.47333453650018287
       },
       "channel_qr": {
-        "mean": 0.32734548688305914,
-        "std": 0.4692653854976703
+        "mean": 0.3357159876101978,
+        "std": 0.47226828637548035
       },
       "customer_prior_failure_rate": {
-        "mean": 0.10860972637583707,
-        "std": 0.1541053679912641
+        "mean": 0.09775668867228401,
+        "std": 0.16813716794771078
       },
       "merchant_prior_failure_rate": {
-        "mean": 0.11152900011493014,
-        "std": 0.05937523824041301
+        "mean": 0.11477713259233675,
+        "std": 0.06601465134934807
       },
       "customer_prior_attempts": {
-        "mean": 6.042507781236105,
-        "std": 3.598485803544955
+        "mean": 5.161543959971408,
+        "std": 3.858558293786755
       }
     },
-    "calibration": "Sigmoid on held-out middle period; validation also selects algorithm; final test untouched",
-    "last_refresh": "2026-10-14T20:27:37.222836+00:00",
+    "calibration": "Separate chronological selection and calibration periods; final test untouched",
+    "last_refresh": "2026-10-16T16:48:27.306702+00:00",
     "limitations": [
       "Synthetic patterns only; no production validity",
       "Same customer cohorts may appear across temporal snapshots",
       "SHAP explains raw model margin, not calibrated probability"
     ],
     "tracking": "mlflow",
-    "mlflow_run_id": "27077df123754f2eb5408a442d6249eb"
+    "mlflow_run_id": "5ead9177e8214e38b03a7b7e069ebf1c"
   }
 }

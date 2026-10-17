@@ -1,3 +1,4 @@
+import sqlite3
 from datetime import datetime, timedelta
 from typing import Literal
 from fastapi import APIRouter, HTTPException
@@ -67,10 +68,10 @@ class PaymentRequest(BaseModel):
     channel: Literal["app", "qr", "ussd"]
 
 
-def call(fn, *args):
+def call(fn, *args, **kwargs):
     try:
-        return fn(*args)
-    except ValueError as e:
+        return fn(*args, **kwargs)
+    except (ValueError, sqlite3.IntegrityError) as e:
         raise HTTPException(409, str(e)) from e
 
 
@@ -153,7 +154,6 @@ def payment(data: PaymentRequest):
         return {"status": "unavailable", "probability": None}
     events, cs = models.load_data()
     now = store.utc()
-    cutoff = store.utc((datetime.fromisoformat(now) - timedelta(days=7)).isoformat())
     with store.connect() as c:
         if (
             not c.execute(
@@ -164,34 +164,9 @@ def payment(data: PaymentRequest):
             ).fetchone()
         ):
             raise HTTPException(404, "Customer or merchant not found")
-    first = events.sort_values(["occurred_at", "event_id"]).drop_duplicates(
-        "attempt_id"
+    row = models.pre_attempt_row(
+        events, data.customer_id, data.merchant_id, data.amount_minor, data.channel, now
     )
-    recent = first[
-        (first.occurred_at > cutoff)
-        & (first.occurred_at < now)
-        & (first.received_at <= first.occurred_at)
-        & first.status.isin(["succeeded", "failed", "timeout"])
-    ]
-    customer = recent[recent.customer_id == data.customer_id]
-    merchant = recent[recent.merchant_id == data.merchant_id]
-    row = {
-        "amount_minor": data.amount_minor,
-        "hour": datetime.fromisoformat(now).hour,
-        "channel_ussd": int(data.channel == "ussd"),
-        "channel_qr": int(data.channel == "qr"),
-        "customer_prior_attempts": len(customer),
-        "customer_prior_failure_rate": float(
-            customer.status.isin(["failed", "timeout"]).mean()
-        )
-        if len(customer)
-        else 0,
-        "merchant_prior_failure_rate": float(
-            merchant.status.isin(["failed", "timeout"]).mean()
-        )
-        if len(merchant)
-        else 0,
-    }
     return models.prediction(artifact, row)
 
 
@@ -217,19 +192,74 @@ def automation():
 def report():
     s = analytics.snapshot()
     actions = decisions.list_actions()
+    from collections import Counter
+    from .operations import servicing_report
+
+    predictions = models.churn_predictions(s)
+    with store.connect() as c:
+        executions = dict(
+            c.execute(
+                "SELECT status,COUNT(*) FROM executions GROUP BY status"
+            ).fetchall()
+        )
+        deliveries = dict(
+            c.execute(
+                "SELECT status,COUNT(*) FROM deliveries GROUP BY status"
+            ).fetchall()
+        )
+        complaints = dict(
+            c.execute(
+                "SELECT category,COUNT(*) FROM complaints WHERE status='open' GROUP BY category"
+            ).fetchall()
+        )
     return {
         "as_of": s["as_of"],
         "synthetic": True,
         "reliability_7d": s["windows"]["7d"],
         "customers": len(s["customers"]),
         "merchants": len(s["merchants"]),
+        "active_customers": sum(
+            c["behavior"]["frequency_30d"] > 0 for c in s["customers"]
+        ),
+        "successful_volume_minor_30d": sum(
+            c["behavior"]["monetary_minor_30d"] for c in s["customers"]
+        ),
+        "customer_segments": dict(
+            Counter(seg for c in s["customers"] for seg in c["segments"])
+        ),
+        "elevated_churn": sum(
+            p.get("probability", 0) >= 0.65
+            for p in predictions.values()
+            if p.get("probability") is not None
+        ),
+        "churn_model_available": any(
+            p["status"] == "available" for p in predictions.values()
+        ),
+        "merchants_requiring_attention": [
+            m["id"]
+            for m in s["merchants"]
+            if m["operational_problem"]
+            or m["reliability_deterioration"]
+            or m.get("overdue_settlements", 0)
+        ],
+        "merchant_segments": dict(
+            Counter(seg for m in s["merchants"] for seg in m["segments"])
+        ),
         "open_actions": sum(a["status"] in decisions.OPEN for a in actions),
+        "recommended_interventions": dict(
+            Counter(a["kind"] for a in actions if a["status"] in decisions.OPEN)
+        ),
         "high_priority_actions": [
             a
             for a in actions
             if a["priority"] == "high" and a["status"] in decisions.OPEN
         ],
-        "limitations": "No causal conclusions or proven intervention uplift. Executions are dry-run simulations.",
+        "workflow_outcomes": executions,
+        "delivery_outcomes": deliveries,
+        "open_complaint_categories": complaints,
+        "servicing": servicing_report(),
+        "reliability_trend": s["daily_trend"],
+        "limitations": "Synthetic observational results; neither drafts nor SMTP acceptance prove delivery or causal uplift.",
     }
 
 

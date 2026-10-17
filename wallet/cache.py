@@ -1,6 +1,7 @@
 """Optional Redis cache for read-only summaries. Decisions always read SQLite."""
 
 import json
+import hashlib
 from . import config
 
 
@@ -13,7 +14,10 @@ def cached_summary(factory):
         client = redis.Redis.from_url(
             config.REDIS_URL, socket_connect_timeout=0.3, socket_timeout=0.3
         )
-        key = "careflow:wallet:summary:v1"
+        key = (
+            "careflow:wallet:summary:v2:"
+            + hashlib.sha256(str(config.DB_PATH.resolve()).encode()).hexdigest()[:16]
+        )
         existing = client.get(key)
         if existing:
             return {**json.loads(existing), "cache": "redis; up to 30 seconds old"}

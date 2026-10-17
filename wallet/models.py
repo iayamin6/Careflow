@@ -102,64 +102,112 @@ def load_data():
     return events, customers
 
 
-def payment_dataset(events):
-    # Build rolling history from events known strictly before each attempt begins.
-    first = (
-        events.sort_values(["occurred_at", "event_id"])
-        .drop_duplicates("attempt_id")
-        .sort_values("occurred_at")
+def terminal_history(events):
+    """First terminal outcomes become usable only when actually received."""
+    first = events.sort_values(["occurred_at", "event_id"]).drop_duplicates(
+        "attempt_id"
     )
     terminal = (
         events[events.status.isin(["failed", "timeout", "succeeded"])]
-        .sort_values("occurred_at")
+        .sort_values(["occurred_at", "event_id"])
         .drop_duplicates("attempt_id")
+        .copy()
     )
-    outcomes = terminal.set_index("attempt_id").status.to_dict()
+    terminal["attempt_started_at"] = terminal.attempt_id.map(
+        first.set_index("attempt_id").occurred_at
+    )
+    terminal["available_at"] = terminal[["occurred_at", "received_at"]].max(axis=1)
+    return first, terminal
+
+
+def pre_attempt_row(
+    events, customer_id, merchant_id, amount_minor, channel, at, terminal=None
+):
+    if terminal is None:
+        _, terminal = terminal_history(events)
+    cutoff = utc((datetime.fromisoformat(at) - timedelta(days=7)).isoformat())
+    history = terminal[
+        (terminal.available_at < at)
+        & (terminal.attempt_started_at > cutoff)
+        & (terminal.attempt_started_at < at)
+    ]
+    customer = history[history.customer_id == customer_id]
+    merchant = history[history.merchant_id == merchant_id]
+    return {
+        "amount_minor": float(amount_minor),
+        "hour": datetime.fromisoformat(at).hour,
+        "channel_ussd": int(channel == "ussd"),
+        "channel_qr": int(channel == "qr"),
+        "customer_prior_attempts": len(customer),
+        "customer_prior_failure_rate": float(
+            customer.status.isin(["failed", "timeout"]).mean()
+        )
+        if len(customer)
+        else 0,
+        "merchant_prior_failure_rate": float(
+            merchant.status.isin(["failed", "timeout"]).mean()
+        )
+        if len(merchant)
+        else 0,
+    }
+
+
+def payment_dataset(events):
     from collections import defaultdict, deque
 
+    first, terminal = terminal_history(events)
+    outcomes = terminal.set_index("attempt_id").status.to_dict()
+    known_times = terminal.set_index("attempt_id").available_at.to_dict()
+    timeline = terminal.sort_values("available_at").to_dict("records")
     histories = defaultdict(deque)
+    cursor = 0
     rows = []
-    for r in first.to_dict("records"):
+    for r in first.sort_values("occurred_at").to_dict("records"):
         time = pd.Timestamp(r["occurred_at"])
-        vals = {}
+        while (
+            cursor < len(timeline)
+            and timeline[cursor]["available_at"] < r["occurred_at"]
+        ):
+            item = timeline[cursor]
+            cursor += 1
+            entry = (
+                pd.Timestamp(item["available_at"]),
+                int(item["status"] in ("failed", "timeout")),
+                pd.Timestamp(item["attempt_started_at"]),
+            )
+            for key, label in [
+                (item["customer_id"], "customer"),
+                (item["merchant_id"], "merchant"),
+            ]:
+                histories[(label, key)].append(entry)
+        values = {}
         for key, label in [
             (r["customer_id"], "customer"),
             (r["merchant_id"], "merchant"),
         ]:
-            h = histories[(label, key)]
-            while h and h[0][0] < time - pd.Timedelta(days=7):
-                h.popleft()
-            visible = [x for x in h if x[0] < time]
-            vals[label + "_prior_failure_rate"] = (
+            history = histories[(label, key)]
+            while history and history[0][0] <= time - pd.Timedelta(days=7):
+                history.popleft()
+            visible = [x for x in history if time - pd.Timedelta(days=7) < x[2] < time]
+            values[label + "_prior_failure_rate"] = (
                 sum(x[1] for x in visible) / len(visible) if visible else 0
             )
             if label == "customer":
-                vals["customer_prior_attempts"] = len(visible)
+                values["customer_prior_attempts"] = len(visible)
         outcome = outcomes.get(r["attempt_id"])
         if outcome:
             rows.append(
                 {
                     "as_of": r["occurred_at"],
+                    "label_known_at": known_times[r["attempt_id"]],
                     "target": int(outcome in ("failed", "timeout")),
                     "amount_minor": r["amount_minor"],
                     "hour": time.hour,
                     "channel_ussd": int(r["channel"] == "ussd"),
                     "channel_qr": int(r["channel"] == "qr"),
-                    **vals,
+                    **values,
                 }
             )
-        # Only immediately observed first-event terminal outcomes enter history. Later confirmations are excluded.
-        if (
-            r["status"] in ("succeeded", "failed", "timeout")
-            and r["received_at"] <= r["occurred_at"]
-        ):
-            for key, label in [
-                (r["customer_id"], "customer"),
-                (r["merchant_id"], "merchant"),
-            ]:
-                histories[(label, key)].append(
-                    (time, int(r["status"] in ("failed", "timeout")))
-                )
     return pd.DataFrame(rows)
 
 
@@ -197,7 +245,7 @@ def train():
             "At least 330 days of history are required for temporal training/calibration/test"
         )
     samples = []
-    for age in [60, 90, 120, 150, 180, 240, 300]:
+    for age in [60, 90, 120, 150, 180, 210, 240, 300]:
         at = utc((start + pd.Timedelta(days=age)).isoformat())
         df = churn_features(at, events, customers)
         future = events[
@@ -220,7 +268,7 @@ def train():
             "churn",
             churn,
             CHURN_FEATURES,
-            [churn.age <= 180, churn.age == 240, churn.age == 300],
+            [churn.age <= 180, churn.age == 210, churn.age == 240, churn.age == 300],
         ),
         (
             "payment",
@@ -228,7 +276,15 @@ def train():
             PAYMENT_FEATURES,
             [
                 pd.to_datetime(payment.as_of, utc=True)
-                < start + pd.Timedelta(days=210),
+                < start + pd.Timedelta(days=180),
+                (
+                    pd.to_datetime(payment.as_of, utc=True)
+                    >= start + pd.Timedelta(days=210)
+                )
+                & (
+                    pd.to_datetime(payment.as_of, utc=True)
+                    < start + pd.Timedelta(days=240)
+                ),
                 (
                     pd.to_datetime(payment.as_of, utc=True)
                     >= start + pd.Timedelta(days=240)
@@ -242,8 +298,19 @@ def train():
             ],
         ),
     ]:
-        tr, va, te = [df[m].copy() for m in masks]
-        if any(len(x) == 0 or x.target.nunique() < 2 for x in (tr, va, te)):
+        tr, va, ca, te = [df[m].copy() for m in masks]
+        if name == "payment":
+            tr = tr[
+                tr.label_known_at < utc((start + pd.Timedelta(days=210)).isoformat())
+            ]
+            va = va[
+                va.label_known_at < utc((start + pd.Timedelta(days=240)).isoformat())
+            ]
+            ca = ca[
+                ca.label_known_at < utc((start + pd.Timedelta(days=300)).isoformat())
+            ]
+            te = te[te.label_known_at <= utc(end.isoformat())]
+        if any(len(x) == 0 or x.target.nunique() < 2 for x in (tr, va, ca, te)):
             raise ValueError(
                 f"{name}: each temporal split requires both target classes"
             )
@@ -288,10 +355,27 @@ def train():
             ).reshape(-1, 1)
 
         calibration = LogisticRegression().fit(
-            logit(model.predict_proba(va[features])[:, 1]), va.target
+            logit(model.predict_proba(ca[features])[:, 1]), ca.target
         )
         raw = model.predict_proba(te[features])[:, 1]
         prob = calibration.predict_proba(logit(raw))[:, 1]
+        from sklearn.metrics import precision_recall_curve
+
+        calibration_prob = calibration.predict_proba(
+            logit(model.predict_proba(ca[features])[:, 1])
+        )[:, 1]
+        precision, recall, thresholds = precision_recall_curve(
+            ca.target, calibration_prob
+        )
+        f1 = (
+            2
+            * precision[:-1]
+            * recall[:-1]
+            / np.maximum(precision[:-1] + recall[:-1], 1e-12)
+        )
+        threshold = float(thresholds[int(np.argmax(f1))]) if len(thresholds) else 0.5
+        from sklearn.metrics import precision_score, recall_score
+
         report = {
             "name": name,
             "version": datetime.now().strftime("%Y%m%d%H%M%S"),
@@ -303,16 +387,31 @@ def train():
             "features": features,
             "selection_validation": selection,
             "test": evaluate(te.target, prob),
+            "review_threshold": threshold,
+            "test_at_review_threshold": {
+                "precision": float(
+                    precision_score(te.target, prob >= threshold, zero_division=0)
+                ),
+                "recall": float(
+                    recall_score(te.target, prob >= threshold, zero_division=0)
+                ),
+            },
+            "threshold_method": "Maximum F1 on calibration data; internal review policy only, not permission to contact customers",
             "baseline_test": evaluate(te.target, np.full(len(te), tr.target.mean())),
             "splits": {
                 label: {"rows": len(x), "first": x.as_of.min(), "last": x.as_of.max()}
-                for label, x in [("train", tr), ("calibration", va), ("test", te)]
+                for label, x in [
+                    ("train", tr),
+                    ("selection", va),
+                    ("calibration", ca),
+                    ("test", te),
+                ]
             },
             "feature_reference": {
                 f: {"mean": float(tr[f].mean()), "std": float(tr[f].std())}
                 for f in features
             },
-            "calibration": "Sigmoid on held-out middle period; validation also selects algorithm; final test untouched",
+            "calibration": "Separate chronological selection and calibration periods; final test untouched",
             "last_refresh": utc(),
             "limitations": [
                 "Synthetic patterns only; no production validity",
@@ -361,11 +460,21 @@ def train():
     return reports
 
 
+def active_directory():
+    pointer = config.MODEL_DIR / "active.json"
+    if pointer.exists():
+        candidate = json.loads(pointer.read_text())["candidate"]
+        if not candidate.isalnum():
+            raise ValueError("Invalid active model identifier")
+        return config.MODEL_DIR / "candidates" / candidate
+    return config.MODEL_DIR
+
+
 def load(name):
-    path = config.MODEL_DIR / f"{name}.pkl"
-    if not path.exists():
-        return None
     try:
+        path = active_directory() / f"{name}.pkl"
+        if not path.exists():
+            return None
         with path.open("rb") as f:
             return pickle.load(f)
     except Exception:
@@ -428,10 +537,18 @@ def churn_predictions(data):
 def monitoring():
     result = {}
     for name in ("payment", "churn"):
-        path = config.MODEL_DIR / f"{name}.json"
-        result[name] = (
-            json.loads(path.read_text()) if path.exists() else {"status": "unavailable"}
-        )
+        try:
+            path = active_directory() / f"{name}.json"
+            result[name] = (
+                json.loads(path.read_text())
+                if path.exists()
+                else {"status": "unavailable"}
+            )
+        except (ValueError, KeyError, OSError):
+            result[name] = {
+                "status": "unavailable",
+                "reason": "Invalid or unreadable model metadata",
+            }
     if result["churn"].get("features"):
         events, customers = load_data()
         df = churn_features(utc(), events, customers)
@@ -462,39 +579,23 @@ def payment_risks(data):
     if events.empty:
         return {}
     at = data["as_of"]
-    cutoff = utc((datetime.fromisoformat(at) - timedelta(days=7)).isoformat())
     known = events[(events.occurred_at < at) & (events.received_at < at)]
-    first = known.sort_values(["occurred_at", "event_id"]).drop_duplicates("attempt_id")
-    recent = first[
-        (first.occurred_at > cutoff)
-        & (first.received_at <= first.occurred_at)
-        & first.status.isin(["succeeded", "failed", "timeout"])
-    ]
+    first, terminal = terminal_history(known)
     result = {}
     for customer in data["customers"]:
         history = first[first.customer_id == customer["id"]].sort_values("occurred_at")
         if history.empty:
             continue
         last = history.iloc[-1]
-        a = recent[recent.customer_id == customer["id"]]
-        m = recent[recent.merchant_id == last.merchant_id]
-        row = {
-            "amount_minor": float(history.amount_minor.median()),
-            "hour": datetime.fromisoformat(at).hour,
-            "channel_ussd": int(last.channel == "ussd"),
-            "channel_qr": int(last.channel == "qr"),
-            "customer_prior_attempts": len(a),
-            "customer_prior_failure_rate": float(
-                a.status.isin(["failed", "timeout"]).mean()
-            )
-            if len(a)
-            else 0,
-            "merchant_prior_failure_rate": float(
-                m.status.isin(["failed", "timeout"]).mean()
-            )
-            if len(m)
-            else 0,
-        }
+        row = pre_attempt_row(
+            known,
+            customer["id"],
+            last.merchant_id,
+            history.amount_minor.median(),
+            last.channel,
+            at,
+            terminal=terminal,
+        )
         result[customer["id"]] = {
             **prediction(artifact, row),
             "scenario": {

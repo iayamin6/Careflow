@@ -1,154 +1,116 @@
-{
-  "runtime": "n8n 2.43.5 / Node.js 24.19.0",
-  "imported_workflows": 6,
-  "transport": "dry_run; synthetic data only",
-  "url_override": "Native test copies replace http://careflow:8000 with http://127.0.0.1:8010; original exports remain inactive",
-  "runs": [
-    {
-      "workflow_run": "1",
-      "status": "success",
-      "started_at": "2026-10-15T12:19:14.319Z",
-      "finished_at": "2026-10-15T12:19:18.951Z",
-      "nodes": {
-        "Schedule": {
-          "status": "success",
-          "output_items": 1
-        },
-        "Read CareFlow": {
-          "status": "success",
-          "output_items": 1
-        }
-      }
-    },
-    {
-      "workflow_run": "2",
-      "status": "success",
-      "started_at": "2026-10-15T12:19:35.652Z",
-      "finished_at": "2026-10-15T12:19:36.107Z",
-      "nodes": {
-        "Schedule": {
-          "status": "success",
-          "output_items": 1
-        },
-        "Read CareFlow": {
-          "status": "success",
-          "output_items": 1
-        },
-        "Select eligible actions": {
-          "status": "success",
-          "output_items": 0
-        }
-      }
-    },
-    {
-      "workflow_run": "3",
-      "status": "success",
-      "started_at": "2026-10-15T12:19:37.523Z",
-      "finished_at": "2026-10-15T12:19:40.848Z",
-      "nodes": {
-        "Schedule": {
-          "status": "success",
-          "output_items": 1
-        },
-        "Read CareFlow": {
-          "status": "success",
-          "output_items": 1
-        },
-        "Select eligible actions": {
-          "status": "success",
-          "output_items": 0
-        }
-      }
-    },
-    {
-      "workflow_run": "4",
-      "status": "success",
-      "started_at": "2026-10-15T12:19:42.244Z",
-      "finished_at": "2026-10-15T12:21:12.661Z",
-      "nodes": {
-        "Schedule": {
-          "status": "success",
-          "output_items": 1
-        },
-        "Read CareFlow": {
-          "status": "success",
-          "output_items": 1
-        },
-        "Select eligible actions": {
-          "status": "success",
-          "output_items": 12
-        },
-        "Record dry-run execution": {
-          "status": "success",
-          "output_items": 12
-        }
-      }
-    },
-    {
-      "workflow_run": "5",
-      "status": "success",
-      "started_at": "2026-10-15T12:21:14.029Z",
-      "finished_at": "2026-10-15T12:21:14.498Z",
-      "nodes": {
-        "Schedule": {
-          "status": "success",
-          "output_items": 1
-        },
-        "Read CareFlow": {
-          "status": "success",
-          "output_items": 1
-        },
-        "Select eligible actions": {
-          "status": "success",
-          "output_items": 0
-        }
-      }
-    },
-    {
-      "workflow_run": "6",
-      "status": "success",
-      "started_at": "2026-10-15T12:21:15.887Z",
-      "finished_at": "2026-10-15T12:21:17.272Z",
-      "nodes": {
-        "Schedule": {
-          "status": "success",
-          "output_items": 1
-        },
-        "Read CareFlow": {
-          "status": "success",
-          "output_items": 1
-        }
-      }
-    },
-    {
-      "workflow_run": "5-approved",
-      "status": "success",
-      "started_at": "2026-10-15T12:21:53.852Z",
-      "finished_at": "2026-10-15T12:21:57.504Z",
-      "nodes": {
-        "Schedule": {
-          "status": "success",
-          "output_items": 1
-        },
-        "Read CareFlow": {
-          "status": "success",
-          "output_items": 1
-        },
-        "Select eligible actions": {
-          "status": "success",
-          "output_items": 1
-        },
-        "Record dry-run execution": {
-          "status": "success",
-          "output_items": 1
-        }
+[
+  {
+    "workflow": 1,
+    "status": "success",
+    "finished": true,
+    "nodes": {
+      "Schedule": {
+        "status": "success",
+        "items": 1
+      },
+      "Read CareFlow": {
+        "status": "success",
+        "items": 1
       }
     }
-  ],
-  "notes": [
-    "Python runner unavailable; all Code nodes use the successfully registered JavaScript runner.",
-    "CLI execution verified; recurring schedules remain inactive.",
-    "Workflows 2 and 3 had no eligible individual payment actions because shared merchant incidents own their alerts.",
-    "Workflow 5 was rerun after approval to exercise nonempty execution."
-  ]
-}
+  },
+  {
+    "workflow": 2,
+    "status": "success",
+    "finished": true,
+    "nodes": {
+      "Schedule": {
+        "status": "success",
+        "items": 1
+      },
+      "Read CareFlow": {
+        "status": "success",
+        "items": 1
+      },
+      "Select eligible actions": {
+        "status": "success",
+        "items": 0
+      }
+    }
+  },
+  {
+    "workflow": 3,
+    "status": "success",
+    "finished": true,
+    "nodes": {
+      "Schedule": {
+        "status": "success",
+        "items": 1
+      },
+      "Read CareFlow": {
+        "status": "success",
+        "items": 1
+      },
+      "Select eligible actions": {
+        "status": "success",
+        "items": 0
+      }
+    }
+  },
+  {
+    "workflow": 4,
+    "status": "success",
+    "finished": true,
+    "nodes": {
+      "Schedule": {
+        "status": "success",
+        "items": 1
+      },
+      "Read CareFlow": {
+        "status": "success",
+        "items": 1
+      },
+      "Select eligible actions": {
+        "status": "success",
+        "items": 0
+      }
+    }
+  },
+  {
+    "workflow": 5,
+    "status": "success",
+    "finished": true,
+    "nodes": {
+      "Schedule": {
+        "status": "success",
+        "items": 1
+      },
+      "Read CareFlow": {
+        "status": "success",
+        "items": 1
+      },
+      "Select eligible actions": {
+        "status": "success",
+        "items": 1
+      },
+      "Record dry-run execution": {
+        "status": "success",
+        "items": 1
+      },
+      "Process delivery outbox": {
+        "status": "success",
+        "items": 1
+      }
+    }
+  },
+  {
+    "workflow": 6,
+    "status": "success",
+    "finished": true,
+    "nodes": {
+      "Schedule": {
+        "status": "success",
+        "items": 1
+      },
+      "Read CareFlow": {
+        "status": "success",
+        "items": 1
+      }
+    }
+  }
+]

@@ -31,7 +31,7 @@ def recommend(data, predictions=None, payment_risks=None):
             (m["reliability_deterioration"] or m["operational_problem"])
             and len(m["affected_customers"]) >= 3
             and not m["insufficient_data"]
-        ):
+        ) or m.get("overdue_settlements", 0):
             covered.update(m["affected_customers"])
             add(
                 "merchant",
@@ -40,6 +40,7 @@ def recommend(data, predictions=None, payment_risks=None):
                 "high",
                 {
                     "unresolved_transactions": m["unresolved_transactions"],
+                    "overdue_settlements": m.get("overdue_settlements", 0),
                     "affected_customers": m["affected_customers"],
                     "success_rate_drop": m["success_rate_drop"],
                     "assessment": "Possible merchant-related pattern; requires investigation",
@@ -53,6 +54,8 @@ def recommend(data, predictions=None, payment_risks=None):
             "segments": segments,
             "unresolved_transactions": c["unresolved_transactions"],
             "frequency_change": c["behavior"]["frequency_change"],
+            "calendar_baseline": c.get("calendar_baseline"),
+            "spark_batch": data.get("spark_batch"),
             "churn_probability": p,
             "payment_risk_scenario": payment_risks.get(id),
             "model_status": "available"
@@ -65,13 +68,25 @@ def recommend(data, predictions=None, payment_risks=None):
             add("customer", id, "payment_investigation", "high", evidence)
         elif c["unresolved_transactions"]:
             continue  # insufficient operational evidence does not make marketing appropriate
+        elif c.get("open_complaints", 0):
+            add(
+                "customer",
+                id,
+                "support_review",
+                "normal",
+                {**evidence, "complaints": c["complaints"]},
+            )
         elif payment_risks.get(id, {}).get("probability", 0) >= 0.3:
             add("customer", id, "payment_risk_review", "normal", evidence)
         elif c["tenure_days"] < 30 and c["behavior"]["frequency_30d"] < 3:
             add("customer", id, "onboarding_assistance", "normal", evidence, True)
-        elif "inactive" in segments:
+        elif "inactive" in segments and c.get("inactivity_beyond_cadence", True):
             add("customer", id, "re_engagement", "normal", evidence, True)
-        elif "declining_engagement" in segments or (p is not None and p >= 0.65):
+        elif (
+            "declining_engagement" in segments or (p is not None and p >= 0.65)
+        ) and not (
+            "inactive" in segments and not c.get("inactivity_beyond_cadence", True)
+        ):
             add("customer", id, "retention_outreach", "normal", evidence, True)
     return result
 
@@ -82,6 +97,9 @@ def refresh(as_of=None):
 
     predictions = churn_predictions(data)
     forecasts = payment_risks(data)
+    from .governance import log_churn
+
+    log_churn(data, predictions)
     desired = recommend(
         data,
         {
@@ -92,9 +110,44 @@ def refresh(as_of=None):
         forecasts,
     )
     now = utc()
-    keys = {(d["entity_type"], d["entity_id"], d["kind"]) for d in desired}
     with connect() as c:
         c.execute("BEGIN IMMEDIATE")
+        # Include reviewed resolution follow-up in the desired set so later
+        # refreshes preserve its approval instead of superseding it immediately.
+        for customer in data["customers"]:
+            if (
+                customer["unresolved_transactions"]
+                or not customer["behavior"]["frequency_30d"]
+            ):
+                continue
+            prior = c.execute(
+                "SELECT a.id FROM actions a JOIN incidents i ON i.action_id=a.id WHERE a.entity_type='customer' AND a.entity_id=? AND a.kind='payment_investigation' AND a.status='completed' AND i.status='resolved' ORDER BY a.id DESC LIMIT 1",
+                (customer["id"],),
+            ).fetchone()
+            if (
+                not prior
+                or c.execute(
+                    "SELECT 1 FROM actions WHERE entity_id=? AND kind='resolution_follow_up' AND status IN ('completed','dismissed') AND json_extract(evidence,'$.resolved_investigation')=?",
+                    (customer["id"], prior[0]),
+                ).fetchone()
+            ):
+                continue
+            desired.append(
+                {
+                    "entity_type": "customer",
+                    "entity_id": customer["id"],
+                    "kind": "resolution_follow_up",
+                    "priority": "normal",
+                    "approval_required": True,
+                    "evidence": {
+                        "resolved_investigation": prior[0],
+                        "observed_successful_transactions": customer["behavior"][
+                            "frequency_30d"
+                        ],
+                    },
+                }
+            )
+        keys = {(d["entity_type"], d["entity_id"], d["kind"]) for d in desired}
         old = c.execute(
             "SELECT * FROM actions WHERE status IN ('pending','approved','retry')"
         ).fetchall()
@@ -112,6 +165,12 @@ def refresh(as_of=None):
                 )
         for d in desired:
             key = (d["entity_type"], d["entity_id"], d["kind"])
+            suppressed = c.execute(
+                "SELECT 1 FROM overrides WHERE entity_type=? AND entity_id=? AND kind=? AND expires_at>?",
+                (*key, now),
+            ).fetchone()
+            if suppressed:
+                continue
             existing = c.execute(
                 "SELECT id FROM actions WHERE entity_type=? AND entity_id=? AND kind=? AND status IN ('pending','approved','retry','executing')",
                 key,
@@ -149,33 +208,6 @@ def refresh(as_of=None):
                 c.execute("SELECT last_insert_rowid()").fetchone()[0],
                 d,
             )
-        # Resolution follow-up only after completed investigation and current evidence of recovery.
-        for customer in data["customers"]:
-            if (
-                customer["unresolved_transactions"]
-                or customer["behavior"]["frequency_30d"] == 0
-            ):
-                continue
-            prior = c.execute(
-                "SELECT id FROM actions WHERE entity_type='customer' AND entity_id=? AND kind='payment_investigation' AND status='completed' ORDER BY id DESC LIMIT 1",
-                (customer["id"],),
-            ).fetchone()
-            if prior:
-                evidence = {
-                    "resolved_investigation": prior[0],
-                    "observed_successful_transactions": customer["behavior"][
-                        "frequency_30d"
-                    ],
-                }
-                duplicate = c.execute(
-                    "SELECT 1 FROM actions WHERE entity_id=? AND kind='resolution_follow_up' AND json_extract(evidence,'$.resolved_investigation')=?",
-                    (customer["id"], prior[0]),
-                ).fetchone()
-                if not duplicate:
-                    c.execute(
-                        "INSERT OR IGNORE INTO actions(entity_type,entity_id,kind,priority,evidence,status,approval_required,created_at,updated_at) VALUES('customer',?,'resolution_follow_up','normal',?,'pending',1,?,?)",
-                        (customer["id"], json.dumps(evidence), now, now),
-                    )
     return {
         "snapshot": data,
         "models": predictions,
@@ -213,15 +245,30 @@ def execute(id, key, simulate_failure=False):
         event_version = c.execute(
             "SELECT COALESCE(MAX(rowid),0) FROM payment_events"
         ).fetchone()[0]
+        target = c.execute(
+            "SELECT entity_type,entity_id FROM actions WHERE id=?", (id,)
+        ).fetchone()
+    if not target:
+        raise ValueError("Action is not executable")
     data = snapshot()
+    # Merchant policy uses observed operations. Customer eligibility needs only that
+    # customer's predictions; keep every merchant to retain shared-incident precedence.
+    model_data = {
+        **data,
+        "customers": [
+            x
+            for x in data["customers"]
+            if target["entity_type"] == "customer" and x["id"] == target["entity_id"]
+        ],
+    }
     now = utc()
     from .models import churn_predictions, payment_risks
 
-    churn = churn_predictions(data)
+    churn = churn_predictions(model_data) if model_data["customers"] else {}
     current_recommendations = recommend(
         data,
         {k: v["probability"] for k, v in churn.items() if v["status"] == "available"},
-        payment_risks(data),
+        payment_risks(model_data) if model_data["customers"] else {},
     )
     with connect() as c:
         c.execute("BEGIN IMMEDIATE")
@@ -258,6 +305,9 @@ def execute(id, key, simulate_failure=False):
             (x for x in data["customers"] if x["id"] == a["entity_id"]), None
         )
         if communication:
+            from .operations import communication_allowed
+
+            communication_allowed(c, a)
             customer = c.execute(
                 "SELECT * FROM wallet_customers WHERE id=?", (a["entity_id"],)
             ).fetchone()
@@ -284,6 +334,10 @@ def execute(id, key, simulate_failure=False):
             ).fetchone()
             if contact:
                 raise ValueError("Seven-day contact frequency limit reached")
+            if a["kind"] == "resolution_follow_up":
+                from .operations import resolution_allowed
+
+                resolution_allowed(c, a, current)
         else:
             if (a["entity_type"], a["entity_id"], a["kind"]) not in {
                 (d["entity_type"], d["entity_id"], d["kind"])
@@ -333,6 +387,10 @@ def execute(id, key, simulate_failure=False):
                 id,
             ),
         )
+        if communication and not simulate_failure:
+            from .delivery import enqueue
+
+            enqueue(c, key, a)
         audit(
             c,
             "workflow_" + status,
@@ -347,17 +405,6 @@ def execute(id, key, simulate_failure=False):
 
 
 def draft(action):
-    texts = {
-        "onboarding_assistance": "Would you like help getting started with your wallet?",
-        "re_engagement": "We are here if you need help using your wallet again.",
-        "retention_outreach": "Would you like assistance with your recent wallet experience?",
-        "resolution_follow_up": "Recent payment activity appears successful. Please let us know if you still need assistance.",
-    }
-    return {
-        "subject": "CareFlow wallet support",
-        "body": texts.get(
-            action["kind"], "Your wallet support team is available to help."
-        ),
-        "entity_id": action["entity_id"],
-        "source": "structured template; no financial incentives or causal claims",
-    }
+    from .operations import personalized_draft
+
+    return personalized_draft(action)

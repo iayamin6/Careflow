@@ -1,0 +1,25 @@
+{
+  "/": 200,
+  "/health": 200,
+  "/customers": 200,
+  "/scores": 200,
+  "/churn": 200,
+  "/score-history": 200,
+  "/wallet": 200,
+  "/wallet/analytics": 200,
+  "/wallet/models": 200,
+  "/wallet/report": 200,
+  "/wallet/outcomes": 200,
+  "/wallet/incidents": 200,
+  "/wallet/servicing": 200,
+  "/wallet/complaints": 200,
+  "/wallet/batch": 200,
+  "/wallet/deliveries": 200,
+  "/wallet/experiments": 200,
+  "/wallet/models/candidates": 200,
+  "/wallet/models/monitoring": 200,
+  "payment_model": {
+    "status": "available",
+    "has_shap_explanation": true
+  }
+}

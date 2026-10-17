@@ -5,3 +5,10 @@ __pycache__
 *.log
 mlruns
 .pytest_cache
+.local
+data/batch
+ml/wallet_models_v2
+spark/target
+*.token
+data/wallet*.db
+data/mlflow.db

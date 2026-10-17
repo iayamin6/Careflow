@@ -47,6 +47,14 @@
         "method": "POST",
         "options": {
           "timeout": 120000
+        },
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth"
+      },
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "careflow-api",
+          "name": "CareFlow Automation"
         }
       }
     }
