@@ -1,0 +1,116 @@
+[
+  {
+    "workflow": 1,
+    "status": "success",
+    "finished": true,
+    "nodes": {
+      "Schedule": {
+        "status": "success",
+        "items": 1
+      },
+      "Read CareFlow": {
+        "status": "success",
+        "items": 1
+      }
+    }
+  },
+  {
+    "workflow": 2,
+    "status": "success",
+    "finished": true,
+    "nodes": {
+      "Schedule": {
+        "status": "success",
+        "items": 1
+      },
+      "Read CareFlow": {
+        "status": "success",
+        "items": 1
+      },
+      "Select eligible actions": {
+        "status": "success",
+        "items": 0
+      }
+    }
+  },
+  {
+    "workflow": 3,
+    "status": "success",
+    "finished": true,
+    "nodes": {
+      "Schedule": {
+        "status": "success",
+        "items": 1
+      },
+      "Read CareFlow": {
+        "status": "success",
+        "items": 1
+      },
+      "Select eligible actions": {
+        "status": "success",
+        "items": 0
+      }
+    }
+  },
+  {
+    "workflow": 4,
+    "status": "success",
+    "finished": true,
+    "nodes": {
+      "Schedule": {
+        "status": "success",
+        "items": 1
+      },
+      "Read CareFlow": {
+        "status": "success",
+        "items": 1
+      },
+      "Select eligible actions": {
+        "status": "success",
+        "items": 0
+      }
+    }
+  },
+  {
+    "workflow": 5,
+    "status": "success",
+    "finished": true,
+    "nodes": {
+      "Schedule": {
+        "status": "success",
+        "items": 1
+      },
+      "Read CareFlow": {
+        "status": "success",
+        "items": 1
+      },
+      "Select eligible actions": {
+        "status": "success",
+        "items": 1
+      },
+      "Record dry-run execution": {
+        "status": "success",
+        "items": 1
+      },
+      "Process delivery outbox": {
+        "status": "success",
+        "items": 1
+      }
+    }
+  },
+  {
+    "workflow": 6,
+    "status": "success",
+    "finished": true,
+    "nodes": {
+      "Schedule": {
+        "status": "success",
+        "items": 1
+      },
+      "Read CareFlow": {
+        "status": "success",
+        "items": 1
+      }
+    }
+  }
+]

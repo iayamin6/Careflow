@@ -448,3 +448,6 @@ st.markdown("""
     <p>Real-time health scoring • Churn prediction • Engagement automation</p>
 </div>
 """, unsafe_allow_html=True)
+
+
+st.markdown("[Open wallet intelligence dashboard](http://127.0.0.1:8000/wallet)")

@@ -1,0 +1,57 @@
+{
+  "verified_date": "2026-10-18",
+  "image_build": "passed",
+  "services": [
+    {
+      "Service": "careflow",
+      "State": "running",
+      "Health": "healthy",
+      "Ports": "127.0.0.1:18000->8000/tcp"
+    },
+    {
+      "Service": "n8n",
+      "State": "running",
+      "Health": "",
+      "Ports": "127.0.0.1:15678->5678/tcp"
+    },
+    {
+      "Service": "redis",
+      "State": "running",
+      "Health": "healthy",
+      "Ports": "6379/tcp"
+    }
+  ],
+  "http_checks": {
+    "careflow": 200,
+    "n8n": 200
+  },
+  "regression_tests": {
+    "passed": 57,
+    "environment": "Python 3.12 / Linux arm64 Docker"
+  },
+  "model_training": "both completed with MLflow tracking",
+  "spark": {
+    "id": "e0299547f6cd453c947cb7f56d028052",
+    "status": "succeeded",
+    "input_rows": 17441,
+    "unique_events": 17441,
+    "attempts": 16700,
+    "transactions": 16295,
+    "as_of": "2026-10-17T19:56:17.450768+00:00",
+    "spark_version": "4.0.3",
+    "output_path": "/app/data/batch/e0299547f6cd453c947cb7f56d028052/output",
+    "replicas": 1
+  },
+  "spark_comparison": {
+    "run_id": "e0299547f6cd453c947cb7f56d028052",
+    "checks_passed": 555,
+    "input_rows": 17441,
+    "status": "passed"
+  },
+  "api_smoke": "passed, including SHAP prediction",
+  "limits": [
+    "Remote Spark cluster not verified",
+    "Container n8n health checked; workflow executions previously verified in native n8n",
+    "External provider delivery not exercised"
+  ]
+}

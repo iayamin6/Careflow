@@ -1,0 +1,15 @@
+{
+  "job": {
+    "id": "4c740b1f332c452e8179029bc3710c59",
+    "status": "awaiting_review",
+    "created_at": "2026-10-17T02:49:29.821445+00:00",
+    "finished_at": "2026-10-17T02:49:38.216165+00:00"
+  },
+  "promotion": {
+    "id": "4c740b1f332c452e8179029bc3710c59",
+    "status": "promoted",
+    "created_at": "2026-10-17T02:49:29.821445+00:00",
+    "finished_at": "2026-10-17T02:49:38.216165+00:00"
+  },
+  "both_models_load": true
+}

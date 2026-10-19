@@ -1,0 +1,7 @@
+{
+  "redis_version": "7.4.9",
+  "first": "redis",
+  "second": "redis; up to 30 seconds old",
+  "ttl_seconds": 30,
+  "database_namespaced": true
+}

@@ -1,2 +1,17 @@
 .env
 __pycache__/
+.venv/
+.pytest_cache/
+data/wallet*.db
+ml/wallet_models/
+mlruns/
+*.pyc
+data/mlflow.db
+mlartifacts/
+data/batch/
+spark/target/
+.local/
+*.token
+ml/wallet_models_v2/
+
+data/jobs/

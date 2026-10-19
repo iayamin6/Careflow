@@ -18,8 +18,8 @@ logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(mess
 logger = logging.getLogger(__name__)
 
 DB_PATH = Path(__file__).parent.parent / "data" / "customers.db"
-client  = Groq(api_key=os.getenv("GROQ_API_KEY"))
-MODEL   = "llama-3.3-70b-versatile"
+client = Groq(api_key=os.getenv("GROQ_API_KEY"))
+MODEL = "llama-3.3-70b-versatile"
 
 
 def _gather_weekly_data() -> dict:
@@ -34,8 +34,8 @@ def _gather_weekly_data() -> dict:
     # Health score distribution now
     score_dist = conn.execute("""
         SELECT category, COUNT(*) as cnt
-        FROM health_score_history
-        WHERE scored_at = (SELECT MAX(scored_at) FROM health_score_history WHERE customer_id = health_score_history.customer_id)
+        FROM health_score_history h
+        WHERE h.id = (SELECT id FROM health_score_history WHERE customer_id=h.customer_id ORDER BY scored_at DESC,id DESC LIMIT 1)
         GROUP BY category
     """).fetchall()
 
@@ -59,26 +59,29 @@ def _gather_weekly_data() -> dict:
         ORDER BY p.churn_probability DESC LIMIT 5
     """).fetchall()
 
-    # Emails sent this week
-    emails_sent = conn.execute("""
+    # Email drafts generated this week
+    emails_generated = conn.execute(
+        """
         SELECT email_type, COUNT(*) FROM email_log
         WHERE sent_at >= ? GROUP BY email_type
-    """, (week_ago,)).fetchall()
+    """,
+        (week_ago,),
+    ).fetchall()
 
     # Average health score
     avg_score = conn.execute("""
-        SELECT AVG(score) FROM health_score_history
-        WHERE scored_at = (SELECT MAX(scored_at) FROM health_score_history WHERE customer_id = health_score_history.customer_id)
+        SELECT AVG(score) FROM health_score_history h
+        WHERE h.id = (SELECT id FROM health_score_history WHERE customer_id=h.customer_id ORDER BY scored_at DESC,id DESC LIMIT 1)
     """).fetchone()[0]
 
     conn.close()
 
     return {
-        "new_customers":    new_customers,
-        "score_dist":       {r[0]: r[1] for r in score_dist},
+        "new_customers": new_customers,
+        "score_dist": {r[0]: r[1] for r in score_dist},
         "critical_accounts": critical_accounts,
-        "high_churn":       high_churn,
-        "emails_sent":      {r[0]: r[1] for r in emails_sent},
+        "high_churn": high_churn,
+        "emails_generated": {r[0]: r[1] for r in emails_generated},
         "avg_health_score": round(avg_score, 1) if avg_score else 0,
     }
 
@@ -86,37 +89,52 @@ def _gather_weekly_data() -> dict:
 def generate_weekly_report() -> str:
     data = _gather_weekly_data()
 
-    critical_text = "\n".join([
-        f"  - {r[1]} (score {r[2]:.0f}): {r[3]}" for r in data["critical_accounts"]
-    ]) or "  None"
+    critical_text = (
+        "\n".join(
+            [
+                f"  - {r[1]} (score {r[2]:.0f}): {r[3]}"
+                for r in data["critical_accounts"]
+            ]
+        )
+        or "  None"
+    )
 
-    churn_text = "\n".join([
-        f"  - {r[1]}: {r[2]:.0%} churn risk — {r[3]}" for r in data["high_churn"]
-    ]) or "  None"
+    churn_text = (
+        "\n".join(
+            [f"  - {r[1]}: {r[2]:.0%} churn risk — {r[3]}" for r in data["high_churn"]]
+        )
+        or "  None"
+    )
 
-    emails_text = "\n".join([
-        f"  - {k}: {v} sent" for k, v in data["emails_sent"].items()
-    ]) or "  None sent this week"
+    emails_text = (
+        "\n".join(
+            [
+                f"  - {k}: {v} generated (delivery unverified)"
+                for k, v in data["emails_generated"].items()
+            ]
+        )
+        or "  None generated this week"
+    )
 
     prompt = f"""
 You are the head of customer success. Write a structured weekly report based on this data.
 
 WEEKLY DATA SNAPSHOT:
-- New customers onboarded: {data['new_customers']}
-- Average platform health score: {data['avg_health_score']}/100
-- Health distribution: {data['score_dist']}
+- New customers onboarded: {data["new_customers"]}
+- Average platform health score: {data["avg_health_score"]}/100
+- Health distribution: {data["score_dist"]}
 - Critical accounts (top 5):
 {critical_text}
 - High churn risk accounts (top 5):
 {churn_text}
-- Automated emails sent this week:
+- Email drafts generated this week:
 {emails_text}
 
 Write a plain English report with these exact sections:
 1. WHAT HAPPENED THIS WEEK (2-3 sentences summary)
 2. WHO IS AT RISK AND WHY (specific accounts, specific reasons)
 3. RECOMMENDED ACTIONS (3-5 concrete actions for the team)
-4. WHAT WORKED LAST WEEK (based on email activity and any score improvements)
+4. OUTCOME LIMITATIONS (delivery and causal intervention effectiveness are not measured; do not infer success from drafts)
 
 Be direct and specific. No fluff. Write like a real executive briefing.
 """
@@ -134,7 +152,7 @@ Be direct and specific. No fluff. Write like a real executive briefing.
     conn = sqlite3.connect(DB_PATH)
     conn.execute(
         "INSERT INTO weekly_reports (report_text, created_at) VALUES (?, ?)",
-        (report, datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
+        (report, datetime.now().strftime("%Y-%m-%d %H:%M:%S")),
     )
     conn.commit()
     conn.close()

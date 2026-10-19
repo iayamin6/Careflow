@@ -1,0 +1,71 @@
+services:
+  careflow:
+    build: .
+    image: careflow-wallet:local
+    restart: unless-stopped
+    ports: ["127.0.0.1:${CAREFLOW_API_PORT:-8000}:8000"]
+    environment:
+      REDIS_URL: redis://redis:6379/0
+      MLFLOW_TRACKING_URI: sqlite:////app/data/mlflow.db
+    volumes:
+      - careflow_data:/app/data
+      - careflow_models:/app/ml/wallet_models
+      - careflow_mlruns:/app/mlruns
+      - careflow_mlartifacts:/app/mlartifacts
+      - careflow_credentials:/app/.local
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/health', timeout=5)"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+    depends_on:
+      redis:
+        condition: service_healthy
+  worker:
+    image: careflow-wallet:local
+    restart: unless-stopped
+    command: ["python", "-m", "wallet.jobs"]
+    stop_grace_period: 20s
+    environment:
+      MLFLOW_TRACKING_URI: sqlite:////app/data/mlflow.db
+    volumes:
+      - careflow_data:/app/data
+      - careflow_models:/app/ml/wallet_models
+      - careflow_mlruns:/app/mlruns
+      - careflow_mlartifacts:/app/mlartifacts
+    healthcheck:
+      test: ["CMD", "python", "-m", "wallet.jobs", "--check"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+    depends_on:
+      careflow:
+        condition: service_healthy
+  redis:
+    image: redis:7.4-alpine
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+  n8n:
+    image: n8nio/n8n:2.43.5
+    ports: ["127.0.0.1:${CAREFLOW_N8N_PORT:-5678}:5678"]
+    environment:
+      GENERIC_TIMEZONE: Asia/Dhaka
+      TZ: Asia/Dhaka
+    volumes:
+      - careflow_n8n_wallet:/home/node/.n8n
+      - ./automation/wallet_workflows:/workflows:ro
+    depends_on:
+      careflow:
+        condition: service_healthy
+volumes:
+  careflow_data:
+  careflow_models:
+  careflow_mlruns:
+  careflow_mlartifacts:
+  careflow_credentials:
+  careflow_n8n_wallet:

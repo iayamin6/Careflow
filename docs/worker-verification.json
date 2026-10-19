@@ -1,0 +1,53 @@
+{
+  "jobs": [
+    {
+      "id": "7286a227cec44778bf48a6150ce78510",
+      "kind": "retrain",
+      "status": "succeeded",
+      "created_at": "2026-10-19T16:42:58.876958+00:00",
+      "requested_by": "local-command",
+      "owner": "91ec772805684fe29cd0dfb20218b703",
+      "started_at": "2026-10-19T16:43:03.075973+00:00",
+      "heartbeat_at": "2026-10-19T16:43:13.106937+00:00",
+      "finished_at": "2026-10-19T16:43:13.115007+00:00",
+      "attempts": 1,
+      "result": "{\"id\": \"bc181b4065c144bdac55398b3f79c43e\", \"status\": \"awaiting_review\", \"created_at\": \"2026-10-19T16:43:03.380512+00:00\", \"finished_at\": \"2026-10-19T16:43:11.508311+00:00\"}",
+      "error": null
+    },
+    {
+      "id": "00deab01e09c4b568542e4bbe34644d3",
+      "kind": "spark",
+      "status": "succeeded",
+      "created_at": "2026-10-19T16:42:23.636919+00:00",
+      "requested_by": "queue-verification",
+      "owner": "91ec772805684fe29cd0dfb20218b703",
+      "started_at": "2026-10-19T16:42:29.949674+00:00",
+      "heartbeat_at": "2026-10-19T16:42:48.031394+00:00",
+      "finished_at": "2026-10-19T16:42:48.034765+00:00",
+      "attempts": 1,
+      "result": "{\"id\": \"b5a884287f5c4e5ba59052fa942ef122\", \"status\": \"succeeded\", \"input_rows\": 17441, \"unique_events\": 17441, \"attempts\": 16700, \"transactions\": 16295, \"as_of\": \"2026-10-19T16:42:30.091802+00:00\", \"spark_version\": \"4.0.3\", \"output_path\": \"/app/data/batch/b5a884287f5c4e5ba59052fa942ef122/output\", \"replicas\": 1}",
+      "error": null
+    }
+  ],
+  "worker_healthy": true,
+  "date": "2026-10-19",
+  "native_tests_passed": 62,
+  "container_tests_passed": 62,
+  "api_restart_test": {
+    "job_id": "00deab01e09c4b568542e4bbe34644d3",
+    "status_after_restart": "queued",
+    "attempts_after_restart": 0,
+    "final_status": "succeeded"
+  },
+  "spark_verification": {
+    "run_id": "b5a884287f5c4e5ba59052fa942ef122",
+    "checks_passed": 555,
+    "input_rows": 17441,
+    "status": "passed"
+  },
+  "limitations": [
+    "Single-host SQLite queue, not distributed scheduling",
+    "Interrupted work requires output inspection and explicit retry",
+    "Production host, external credentials and real message recipient not configured"
+  ]
+}

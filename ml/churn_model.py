@@ -20,7 +20,7 @@ from xgboost import XGBClassifier
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s")
 logger = logging.getLogger(__name__)
 
-DB_PATH    = Path(__file__).parent.parent / "data" / "customers.db"
+DB_PATH = Path(__file__).parent.parent / "data" / "customers.db"
 MODEL_PATH = Path(__file__).parent / "churn_model.pkl"
 MODEL_META_PATH = Path(__file__).parent / "churn_model.meta.json"
 RETRAIN_AFTER_HOURS = 24
@@ -48,11 +48,11 @@ def _make_churn_label(df: pd.DataFrame) -> pd.Series:
     critical/at_risk archetypes with low activity = churned.
     """
     churn = (
-        (df["archetype"].isin(["critical"])) |
-        (
-            (df["archetype"] == "at_risk") &
-            (df["days_since_login"] > 10) &
-            (df["login_frequency_weekly"] <= 2)
+        (df["archetype"].isin(["critical"]))
+        | (
+            (df["archetype"] == "at_risk")
+            & (df["days_since_login"] > 10)
+            & (df["login_frequency_weekly"] <= 2)
         )
     ).astype(int)
     return churn
@@ -97,7 +97,9 @@ def train_model() -> XGBClassifier:
     meta = {
         "trained_at": datetime.now().isoformat(),
         "row_count": int(len(df)),
-        "max_signup_date": str(df["signup_date"].max()) if "signup_date" in df.columns else None,
+        "max_signup_date": str(df["signup_date"].max())
+        if "signup_date" in df.columns
+        else None,
     }
     MODEL_META_PATH.write_text(json.dumps(meta))
     logger.info(f"Model saved -> {MODEL_PATH}")
@@ -136,37 +138,6 @@ def load_model() -> XGBClassifier:
         return pickle.load(f)
 
 
-def adjust_probability(p: float, row) -> float:
-    """Adjust probability to make distributions look realistic and varied for showcase."""
-    customer_id = row.get("customer_id", "CUST_0000")
-    try:
-        cid_num = int(customer_id.split("_")[1]) if "_" in customer_id else 42
-    except ValueError:
-        cid_num = 42
-
-    rng = np.random.RandomState(cid_num)
-
-    if p >= 0.70:
-        days_since = row.get("days_since_login", 15)
-        onboard = row.get("onboarding_completion_percentage", 50)
-        factor = (min(days_since, 60) / 60.0) * 0.6 + (1.0 - onboard / 100.0) * 0.4
-        new_p = 0.72 + factor * 0.22 + rng.uniform(-0.02, 0.02)
-        new_p = min(0.965, max(0.71, new_p))
-    elif p >= 0.40:
-        days_since = row.get("days_since_login", 10)
-        onboard = row.get("onboarding_completion_percentage", 70)
-        factor = (min(days_since, 30) / 30.0) * 0.5 + (1.0 - onboard / 100.0) * 0.5
-        new_p = 0.42 + factor * 0.23 + rng.uniform(-0.02, 0.02)
-        new_p = min(0.68, max(0.41, new_p))
-    else:
-        days_since = row.get("days_since_login", 2)
-        factor = min(days_since, 10) / 10.0
-        new_p = 0.01 + factor * 0.15 + rng.uniform(0.0, 0.05)
-        new_p = min(0.38, max(0.005, new_p))
-
-    return float(np.round(new_p, 4))
-
-
 def predict_all() -> pd.DataFrame:
     model = load_model()
 
@@ -178,19 +149,23 @@ def predict_all() -> pd.DataFrame:
     X = df[FEATURES]
     probs = model.predict_proba(X)[:, 1]
 
-    adjusted_probs = [adjust_probability(probs[i], df.iloc[i]) for i in range(len(df))]
+    adjusted_probs = probs.tolist()
 
     def _label(p):
-        if p >= 0.70: return "High Risk"
-        if p >= 0.40: return "Medium Risk"
+        if p >= 0.70:
+            return "High Risk"
+        if p >= 0.40:
+            return "Medium Risk"
         return "Low Risk"
 
-    results = pd.DataFrame({
-        "customer_id":       df["customer_id"],
-        "organization_name": df["organization_name"],
-        "churn_probability": adjusted_probs,
-        "risk_label":        [_label(p) for p in adjusted_probs],
-    })
+    results = pd.DataFrame(
+        {
+            "customer_id": df["customer_id"],
+            "organization_name": df["organization_name"],
+            "churn_probability": adjusted_probs,
+            "risk_label": [_label(p) for p in adjusted_probs],
+        }
+    )
 
     return results
 
@@ -200,11 +175,20 @@ def save_predictions(predictions: pd.DataFrame, explanations: dict) -> None:
     now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     for _, row in predictions.iterrows():
         shap_text = explanations.get(row["customer_id"], "")
-        conn.execute("""
+        conn.execute(
+            """
             INSERT INTO churn_predictions
                 (customer_id, churn_probability, risk_label, shap_explanation, predicted_at)
             VALUES (?, ?, ?, ?, ?)
-        """, (row["customer_id"], row["churn_probability"], row["risk_label"], shap_text, now))
+        """,
+            (
+                row["customer_id"],
+                row["churn_probability"],
+                row["risk_label"],
+                shap_text,
+                now,
+            ),
+        )
     conn.commit()
     conn.close()
     logger.info(f"Saved {len(predictions)} predictions to DB")

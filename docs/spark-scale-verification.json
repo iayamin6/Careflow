@@ -1,0 +1,11 @@
+{
+  "id": "cf0930975b06428392ce1415317d7579",
+  "status": "benchmark",
+  "input_rows": 1006150,
+  "unique_events": 1006150,
+  "attempts": 963200,
+  "transactions": 939000,
+  "as_of": "2026-10-16T16:44:39.377050+00:00",
+  "spark_version": "4.0.3",
+  "replicas": 50
+}
