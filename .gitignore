@@ -13,3 +13,5 @@ spark/target/
 .local/
 *.token
 ml/wallet_models_v2/
+
+data/jobs/

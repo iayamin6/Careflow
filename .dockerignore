@@ -16,3 +16,5 @@ ml/wallet_models
 mlartifacts
 data/*.db-shm
 data/*.db-wal
+
+data/jobs/

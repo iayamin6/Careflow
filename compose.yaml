@@ -1,6 +1,8 @@
 services:
   careflow:
     build: .
+    image: careflow-wallet:local
+    restart: unless-stopped
     ports: ["127.0.0.1:${CAREFLOW_API_PORT:-8000}:8000"]
     environment:
       REDIS_URL: redis://redis:6379/0
@@ -19,6 +21,27 @@ services:
       start_period: 30s
     depends_on:
       redis:
+        condition: service_healthy
+  worker:
+    image: careflow-wallet:local
+    restart: unless-stopped
+    command: ["python", "-m", "wallet.jobs"]
+    stop_grace_period: 20s
+    environment:
+      MLFLOW_TRACKING_URI: sqlite:////app/data/mlflow.db
+    volumes:
+      - careflow_data:/app/data
+      - careflow_models:/app/ml/wallet_models
+      - careflow_mlruns:/app/mlruns
+      - careflow_mlartifacts:/app/mlartifacts
+    healthcheck:
+      test: ["CMD", "python", "-m", "wallet.jobs", "--check"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+    depends_on:
+      careflow:
         condition: service_healthy
   redis:
     image: redis:7.4-alpine

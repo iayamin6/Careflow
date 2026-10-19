@@ -21,3 +21,10 @@ def upgrade(c, now):
     CREATE TABLE IF NOT EXISTS assignments(experiment_id TEXT NOT NULL REFERENCES experiments(id),customer_id TEXT NOT NULL REFERENCES wallet_customers(id),arm TEXT NOT NULL,assigned_at TEXT NOT NULL,PRIMARY KEY(experiment_id,customer_id));
     """)
     c.execute("INSERT OR IGNORE INTO schema_versions VALUES(2,?)", (now,))
+
+    c.executescript("""
+    CREATE TABLE IF NOT EXISTS background_jobs(id TEXT PRIMARY KEY,kind TEXT NOT NULL,status TEXT NOT NULL,created_at TEXT NOT NULL,requested_by TEXT NOT NULL,owner TEXT,started_at TEXT,heartbeat_at TEXT,finished_at TEXT,attempts INTEGER NOT NULL DEFAULT 0,result TEXT,error TEXT);
+    CREATE UNIQUE INDEX IF NOT EXISTS one_active_job_kind ON background_jobs(kind) WHERE status IN ('queued','running');
+    CREATE TABLE IF NOT EXISTS workers(id TEXT PRIMARY KEY,heartbeat_at TEXT NOT NULL);
+    """)
+    c.execute("INSERT OR IGNORE INTO schema_versions VALUES(3,?)", (now,))

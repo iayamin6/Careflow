@@ -70,6 +70,7 @@ def allowed(role, method, path):
             "/wallet/settlements",
             "/wallet/refunds",
             "/wallet/batch",
+            "/wallet/jobs",
             "/wallet/models",
             "/wallet/experiments",
         )

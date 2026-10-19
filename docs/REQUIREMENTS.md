@@ -1,4 +1,4 @@
-# Requirement coverage — 17 October 2026
+# Requirement coverage — 19 October 2026
 
 The master prompt describes an independent portfolio simulation. “Implemented” below means working application code with synthetic/local verification, not certification or a live financial-service deployment.
 
@@ -23,12 +23,12 @@ The master prompt describes an independent portfolio simulation. “Implemented�
 | Redis | Live 30-second summary cache tested; SQLite fallback; cache partitioned by DB path; never used for action eligibility |
 | Security/privacy | Synthetic data, hashed/expiring/revocable tokens, five roles, per-process request throttle, input validation, secret exclusion, protected legacy endpoints |
 | Dashboard | Executive, reliability, customer, merchant, decision, model, automation, incident, servicing, preference, complaint, Spark, experiment, governance and outbox views |
-| Reproducibility | Seeded seasonal/friction generator, separate DB/model paths, scripts, model reports, 57 regression tests, Spark comparisons and setup documentation |
+| Reproducibility | Seeded seasonal/friction generator, separate DB/model paths, scripts, model reports, 62 regression tests, Spark comparisons and setup documentation |
 
 ## Explicit boundaries
 
 - **External provider setup remains:** SMTP/HTTPS adapter code exists and is mock-tested. Actual email/webhook delivery, legacy Slack/Google Sheets/Groq access and provider receipt verification need real credentials and verified recipients. No real messages were sent.
-- **Deployment verification remains:** native API, Redis, MLflow, n8n and local Spark were exercised. Docker build/startup, service health, container tests, model training and Spark/API checks subsequently passed. A remote Spark cluster remains unverified. API background jobs need durable supervision for a deployed service.
+- **Deployment verification remains:** native API, Redis, MLflow, n8n and local Spark were exercised. Docker build/startup, service health, container tests, model training and Spark/API checks subsequently passed. A remote Spark cluster remains unverified. Spark and retraining now use a persistent SQLite queue and a separate supervised worker; queued work survived an API restart in Docker. Remote hosting, TLS and real-provider checks still need deployment configuration.
 - **Value analysis is a scenario:** annualized volume at an assumed margin is implemented. A trained lifetime-value model was not part of the defined core target and is not claimed.
 - **No real financial execution:** settlement/refund entries record confirmed outcomes; there is no real wallet money-movement, fraud scoring, credit decision, compensation issuance or transaction-blocking adapter.
 - **No production validity claim:** synthetic temporal metrics, heuristic NLP/calendar baselines, experimental policy thresholds and simulated experiments require real-world evaluation before operational use.

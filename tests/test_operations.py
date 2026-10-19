@@ -47,6 +47,27 @@ class OperationsTest(unittest.TestCase):
         self.assertEqual(automation.post("/wallet/actions/1/approve").status_code, 403)
         self.assertEqual(automation.post("/scores/run").status_code, 403)
 
+    def test_job_queue_api_permissions_and_persistence(self):
+        from wallet import jobs
+
+        for role in ("analyst", "automation", "support"):
+            client = self.client(role)
+            self.assertEqual(client.post("/wallet/models/retrain").status_code, 403)
+            self.assertEqual(client.post("/wallet/jobs/missing/retry").status_code, 403)
+        client = self.client("operations")
+        response = client.post("/wallet/models/retrain")
+        self.assertEqual(response.status_code, 200)
+        job = response.json()
+        self.assertEqual(job["status"], "queued")
+        self.assertEqual(client.post("/wallet/models/retrain").json()["id"], job["id"])
+        self.assertEqual(client.get("/wallet/jobs").json()["data"][0]["attempts"], 0)
+        jobs.claim("test-worker")
+        jobs.finish(job["id"], "test-worker", "failed")
+        self.assertEqual(
+            client.post("/wallet/jobs/" + job["id"] + "/retry").json()["status"],
+            "queued",
+        )
+
     def test_token_revocation_expiry_and_audit_identity(self):
         client = self.client()
         operator = client.get("/wallet/session").json()

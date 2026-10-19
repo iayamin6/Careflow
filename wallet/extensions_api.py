@@ -1,9 +1,9 @@
 """Protected operational and analytical endpoints for the integrated wallet."""
 
 from typing import Literal
-from fastapi import APIRouter, Request, BackgroundTasks, HTTPException
+from fastapi import APIRouter, Request, HTTPException
 from pydantic import BaseModel, Field
-from . import operations, delivery, experience, batch, governance
+from . import operations, delivery, experience, batch, governance, jobs
 from .api import call
 from .store import connect, audit
 from .security import issue
@@ -213,18 +213,14 @@ def latest_batch():
 
 
 @router.post("/batch/run")
-def run_batch(tasks: BackgroundTasks):
+def run_batch():
     import os
 
     if not os.getenv("SPARK_HOME"):
         raise HTTPException(409, "SPARK_HOME is not configured")
     if not (batch.config.ROOT / "spark/target/careflow-wallet.jar").exists():
         raise HTTPException(409, "Build the Scala Spark jar first")
-    tasks.add_task(batch.run)
-    return {
-        "status": "scheduled",
-        "notice": "Check batch history for completion or failure",
-    }
+    return jobs.enqueue("spark")
 
 
 @router.get("/models/monitoring")
@@ -238,9 +234,18 @@ def candidates():
 
 
 @router.post("/models/retrain")
-def retrain(tasks: BackgroundTasks):
-    tasks.add_task(governance.retrain)
-    return {"status": "scheduled", "notice": "Candidate requires explicit promotion"}
+def retrain():
+    return jobs.enqueue("retrain")
+
+
+@router.get("/jobs")
+def background_jobs():
+    return {"data": jobs.listing(), "worker_healthy": jobs.worker_healthy()}
+
+
+@router.post("/jobs/{id}/retry")
+def retry_job(id: str):
+    return call(jobs.retry, id)
 
 
 @router.post("/models/candidates/{id}/promote")
